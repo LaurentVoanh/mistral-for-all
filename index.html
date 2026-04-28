@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mistral Advanced Interface • NEXUS</title>
+<style>
+:root {
+  --bg: #ffffff; --surface: #f8f9ff; --border: #e2e8f0; --text: #1e293b; --text-muted: #64748b;
+  --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.15); --accent: #8b5cf6;
+  --danger: #ef4444; --success: #10b981;
+  --shadow: 0 4px 20px rgba(0,0,0,0.06); --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+  --radius: 14px; --radius-sm: 10px; --font: system-ui, -apple-system, sans-serif;
+  --transition: all 0.2s ease;
+}
+[data-theme="dark"] {
+  --bg: #0f172a; --surface: #1e293b; --border: #334155; --text: #f1f5f9; --text-muted: #94a3b8;
+  --primary: #60a5fa; --primary-glow: rgba(96, 165, 250, 0.2); --accent: #a78bfa;
+  --shadow: 0 4px 20px rgba(0,0,0,0.3); --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
+}
+[data-theme="sand"] {
+  --bg: #faf7f2; --surface: #f0ebe3; --border: #d9d0c2; --text: #2d2a24; --text-muted: #7a7164;
+  --primary: #8c7b6b; --primary-glow: rgba(140, 123, 107, 0.15); --accent: #a68a64;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font); background: var(--bg); color: var(--text);
+  transition: var(--transition); height: 100vh; display: flex; flex-direction: column;
+  background-image: radial-gradient(circle at 20% 80%, var(--primary-glow) 0%, transparent 40%),
+                    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+}
+header {
+  padding: 14px 20px; background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
+}
+.brand {
+  display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.brand-icon {
+  width: 32px; height: 32px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 16px;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+.controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+select, button, input, textarea {
+  padding: 10px 14px; border: 1px solid var(--border); background: var(--bg);
+  color: var(--text); border-radius: var(--radius-sm); cursor: pointer;
+  font-size: 14px; font-family: var(--font); transition: var(--transition);
+}
+select:focus, input:focus, textarea:focus {
+  outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow);
+}
+button { font-weight: 500; }
+button.primary {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white; border: none; font-weight: 600;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+}
+button.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+button.ghost { background: transparent; }
+button.ghost:hover { background: var(--surface); }
+.status-badge {
+  font-size: 12px; padding: 5px 10px; border-radius: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px;
+}
+.status-badge.active { border-color: var(--success); color: var(--success); }
+#chat-container {
+  flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 18px;
+  scroll-behavior: smooth;
+}
+.message {
+  max-width: 85%; padding: 14px 18px; border-radius: var(--radius);
+  line-height: 1.6; position: relative; animation: fadeUp 0.25s ease;
+  background: var(--surface); border: 1px solid var(--border);
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.message.user {
+  align-self: flex-end; background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white; border: none; border-bottom-right-radius: 6px;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+}
+.message.assistant { align-self: flex-start; border-bottom-left-radius: 6px; }
+.message.system {
+  align-self: center; max-width: 90%; background: var(--bg);
+  font-size: 13px; color: var(--text-muted); border-style: dashed; text-align: center;
+}
+.message .meta {
+  font-size: 11px; opacity: 0.75; margin-top: 8px; padding-top: 8px;
+  border-top: 1px dashed var(--border); display: flex; justify-content: space-between;
+}
+.message .memory-tag {
+  font-size: 10px; background: var(--accent); color: white;
+  padding: 2px 7px; border-radius: 5px; font-weight: 600;
+}
+.message-content { white-space: pre-wrap; word-wrap: break-word; }
+#input-area {
+  padding: 16px 20px; background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; gap: 12px; position: sticky; bottom: 0;
+}
+#input-area textarea {
+  flex: 1; resize: none; padding: 14px 18px; min-height: 52px; max-height: 180px;
+  line-height: 1.5; font-family: var(--font);
+}
+#send-btn { padding: 14px 24px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+#send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+.modal {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
+  display: none; justify-content: center; align-items: center; z-index: 1000;
+  backdrop-filter: blur(6px);
+}
+.modal.active { display: flex; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-content {
+  background: var(--bg); padding: 26px; border-radius: var(--radius);
+  width: 90%; max-width: 640px; box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border); max-height: 90vh; overflow-y: auto;
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.modal h2 {
+  margin-bottom: 18px; font-size: 19px; display: flex; align-items: center; gap: 9px;
+  color: var(--primary);
+}
+.info-card {
+  background: var(--surface); padding: 15px; border-radius: var(--radius-sm);
+  margin-bottom: 18px; border-left: 3px solid var(--primary);
+  font-size: 14px; line-height: 1.6;
+}
+.info-card strong { color: var(--primary); }
+.info-card code {
+  font-family: monospace; background: var(--bg); padding: 2px 6px;
+  border-radius: 4px; font-size: 12px;
+}
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block; margin-bottom: 7px; font-weight: 500; font-size: 14px;
+  color: var(--text-muted);
+}
+.form-group input, .form-group textarea {
+  width: 100%; padding: 11px 13px; border-radius: var(--radius-sm);
+  font-family: var(--font);
+}
+.form-row { display: flex; gap: 12px; }
+.form-row .form-group { flex: 1; }
+.btn-row { display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end; }
+#memory-panel {
+  position: fixed; right: 20px; bottom: 100px; width: 300px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px; z-index: 90;
+  box-shadow: var(--shadow-lg); transform: translateX(calc(100% + 25px));
+  transition: transform 0.25s ease;
+}
+#memory-panel.active { transform: translateX(0); }
+#memory-toggle {
+  position: fixed; right: 20px; bottom: 80px; z-index: 91;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border: none; color: white; font-size: 17px;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.memory-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 11px; padding-bottom: 11px; border-bottom: 1px solid var(--border);
+}
+.memory-header h3 { font-size: 14px; font-weight: 600; }
+.memory-list { max-height: 180px; overflow-y: auto; font-size: 13px; }
+.memory-item {
+  padding: 7px 0; border-bottom: 1px dashed var(--border);
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 7px;
+}
+.memory-item:last-child { border-bottom: none; }
+.memory-item .content { flex: 1; color: var(--text-muted); }
+.memory-item .actions button {
+  padding: 3px 7px; font-size: 11px; border-radius: 4px; background: var(--bg);
+}
+.memory-input {
+  display: flex; gap: 7px; margin-top: 11px; padding-top: 11px;
+  border-top: 1px solid var(--border);
+}
+.memory-input input { flex: 1; padding: 7px 11px; font-size: 13px; }
+.memory-input button { padding: 7px 13px; font-size: 13px; }
+.agent-card {
+  background: var(--bg); padding: 13px; border-radius: var(--radius-sm);
+  margin-bottom: 10px; border: 1px solid var(--border);
+  transition: var(--transition); cursor: pointer;
+}
+.agent-card:hover { border-color: var(--primary); transform: translateX(3px); }
+.agent-card.active { border-color: var(--accent); background: rgba(139, 92, 246, 0.07); }
+.agent-card-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+}
+.agent-card-name { font-weight: 600; font-size: 14px; }
+.agent-card-price {
+  font-family: monospace; font-size: 12px; color: var(--success);
+  background: rgba(16, 185, 129, 0.12); padding: 2px 7px; border-radius: 4px;
+}
+.agent-card-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.agent-card-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.agent-card-tags span {
+  font-size: 10px; padding: 2px 5px; background: var(--surface);
+  border-radius: 4px; color: var(--text-muted);
+}
+#model-select { max-width: 260px; font-size: 13px; }
+.model-hint { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+.toast {
+  position: fixed; bottom: 22px; right: 22px; background: var(--bg);
+  color: var(--text); padding: 13px 18px; border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg); border: 1px solid var(--border);
+  z-index: 2000; animation: toastIn 0.25s ease; display: flex; align-items: center; gap: 9px;
+  max-width: 340px; font-size: 14px;
+}
+@keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast.success { border-left: 3px solid var(--success); }
+.toast.error { border-left: 3px solid var(--danger); }
+.toast.info { border-left: 3px solid var(--primary); }
+.hidden { display: none !important; }
+.loading {
+  display: inline-block; width: 11px; height: 11px; border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 50%; border-top-color: white; animation: spin 0.7s linear infinite; margin-right: 5px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 768px) {
+  header { padding: 11px 14px; }
+  #chat-container { padding: 14px; }
+  .message { max-width: 95%; }
+  #memory-panel { width: calc(100% - 36px); right: 18px; bottom: 88px; }
+  #model-select { max-width: 100%; }
+  .controls { width: 100%; justify-content: space-between; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">✦</div>
+    <span>NEXUS</span>
+  </div>
+  <div class="controls">
+    <span class="status-badge" id="api-status">🔑 API: Inactive</span>
+    <select id="model-select"></select>
+    <select id="agent-select"><option value="">🤖 Select Agent</option></select>
+    <button id="clear-chat" class="ghost">🗑️ Clear</button>
+    <button id="new-chat" class="ghost">➕ New</button>
+  </div>
+  <div class="controls">
+    <select id="theme-select">
+      <option value="light">☀️ Light</option>
+      <option value="dark">🌙 Dark</option>
+      <option value="sand">🏖️ Sand</option>
+    </select>
+    <button id="open-api-modal" class="primary">🔓 Get Free API</button>
+    <button id="open-agent-modal">⚙️ Create Agent</button>
+  </div>
+</header>
+
+<main id="chat-container">
+  <div class="message assistant">
+    <div class="message-content">Welcome to NEXUS. I am your Mistral AI interface with global memory, agent intelligence, and multi-model support. How can I assist you today?</div>
+    <div class="meta"><span>System</span><span class="memory-tag">🧠 Memory Active</span></div>
+  </div>
+</main>
+
+<div id="input-area">
+  <textarea id="user-input" placeholder="Type your message... (Enter to send, Shift+Enter for new line)"></textarea>
+  <button id="send-btn" class="primary">Send ➤</button>
+</div>
+
+<!-- Memory Panel -->
+<button id="memory-toggle">🧠</button>
+<div id="memory-panel">
+  <div class="memory-header">
+    <h3>🧠 Global Memory</h3>
+    <button id="memory-clear" class="ghost" style="padding:3px 7px;font-size:11px">Clear</button>
+  </div>
+  <div class="memory-list" id="memory-list"></div>
+  <div class="memory-input">
+    <input type="text" id="memory-input" placeholder="Add to global memory...">
+    <button id="memory-add">Add</button>
+  </div>
+</div>
+
+<!-- API Modal -->
+<div class="modal" id="api-modal">
+  <div class="modal-content">
+    <h2>🚀 Activate Mistral AI Free Tier</h2>
+    <div class="info-card">
+      <p><strong>💡 Official Free Offer:</strong> Mistral provides <strong>1 billion tokens/month</strong> on their free tier API. That's over <strong>€5,000</strong> in monthly compute value — completely free.</p>
+      <p style="margin-top:9px"><strong>📊 Market Comparison:</strong> Competitors charge ~$0.15–$2.00 per million tokens. 1B tokens = ~1,000–2,000€ saved monthly = thousands of complex queries free.</p>
+      <p style="margin-top:9px"><strong>🔗 Get Your Key:</strong> Visit <code>console.mistral.ai</code> → Create account → API Keys → Generate → Copy your key below.</p>
+    </div>
+    <div class="form-group">
+      <label>Your Mistral API Key</label>
+      <input type="password" id="api-key-input" placeholder="Paste your API key here...">
+      <div class="model-hint">Format: Usually starts with <code>sk-</code> or <code>mistral-</code>, min 20 characters</div>
+    </div>
+    <div class="btn-row">
+      <button id="save-api-key" class="primary">💾 Save & Activate</button>
+      <button id="close-api-modal" class="ghost">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Agent Modal -->
+<div class="modal" id="agent-modal">
+  <div class="modal-content">
+    <h2>⚙️ Create Intelligent Agent</h2>
+    <div class="form-group">
+      <label>Agent Name</label>
+      <input type="text" id="agent-name" placeholder="e.g., CodeArchitect, ResearchBot">
+    </div>
+    <div class="form-group">
+      <label>Role & Expertise</label>
+      <textarea id="agent-desc" rows="2" placeholder="Describe the agent's specialty, tone, and capabilities..."></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Price (€) — Optional</label>
+        <input type="number" id="agent-price" placeholder="0" min="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Memory Tags (comma-separated)</label>
+        <input type="text" id="agent-tags" placeholder="coding,research,creative">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Custom Instructions</label>
+      <textarea id="agent-instructions" rows="3" placeholder="Additional behavioral rules for this agent..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button id="save-agent" class="primary">💾 Create Agent</button>
+      <button id="close-agent-modal" class="ghost">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// ==================== CONFIGURATION ====================
+const MODELS = [  { id: "mistral-small-2506", name: "Mistral Flash", desc: "Réponses instantanées, faible latence", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+   { id: "ministral-8b-2512", name: "MicroGenius 8B", desc: "Compact mais puissant, polyvalent", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 }, { id: "codestral-2508", name: "CodeForge Nexus", desc: "Expert en génération et optimisation de code", tokens: 50000, ctx: "4M", price: 1, temp: 0.48 },
+  { id: "devstral-2512", name: "DevMind Ultra", desc: "Assistant développement full-stack intelligent", tokens: 50000, ctx: "4M", price: 1, temp: 0.48 },
+  { id: "devstral-medium-2507", name: "DevPulse Medium", desc: "Équilibre parfait pour le dev quotidien", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "devstral-small-2507", name: "DevSpark Lite", desc: "Rapide et léger pour tâches dev simples", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "labs-mistral-small-creative", name: "CreatiFlow", desc: "Explosion créative pour idées innovantes", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "magistral-medium-2509", name: "MagiCore Balance", desc: "Puissance maîtrisée, réponse équilibrée", tokens: 75000, ctx: "1B", price: 0.08, temp: 0.48 },
+  { id: "magistral-small-2509", name: "MagiSwift", desc: "Intelligence rapide, précision optimale", tokens: 75000, ctx: "1B", price: 0.08, temp: 0.48 },
+  { id: "ministral-14b-2512", name: "MiniTitan 14B", desc: "Performance dense, efficacité énergétique", tokens: 50000, ctx: "4M", price: 0.5, temp: 0.42 },
+  { id: "ministral-3b-2512", name: "NanoMind 3B", desc: "Ultra-rapide, idéal pour micro-tâches", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "mistral-large-2411", name: "Mistral Prime Legacy", desc: "Raisonnement complexe, expertise établie", tokens: 600000, ctx: "200B", price: 1, temp: 0.30 },
+  { id: "mistral-large-2512", name: "Mistral Omega", desc: "Dernière génération, intelligence suprême", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "mistral-medium-2505", name: "Mistral Equinox", desc: "Équilibre parfait vitesse/précision", tokens: 375000, ctx: "-", price: 0.42, temp: 0.48 },
+  { id: "mistral-medium-2508", name: "Mistral Zenith", desc: "Performance medium optimisée", tokens: 375000, ctx: "-", price: 0.42, temp: 0.48 },
+  { id: "mistral-small-2603", name: "Mistral Nova", desc: "Nouvelle ère des modèles compacts", tokens: 375000, ctx: "-", price: 1, temp: 1.44 },
+  { id: "open-mistral-nemo", name: "Nemo OpenCore", desc: "Polyvalent, open-source, fiable", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "pixtral-12b-2409", name: "Pixtral Visionary", desc: "Analyse visuelle + texte, multimodal", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "pixtral-large-2411", name: "Pixtral OmniSight", desc: "Vision premium, compréhension profonde", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "voxtral-mini-2507", name: "Voxtral Echo Mini", desc: "Traitement audio léger et précis", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
+  { id: "voxtral-small-2507", name: "Voxtral Sonic", desc: "Audio rapide, transcription intelligente", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 }
+];
+
+const DB_NAME = "NEXUS_AI_DB";
+const DB_VERSION = 2;
+let state = { apiKey: null, chatId: null, messages: [], agent: null, model: MODELS[11].id, globalMemories: [] };
+
+// ==================== UTILS ====================
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const uuid = () => crypto.randomUUID();
+const now = () => Date.now();
+
+const toast = (msg, type = "info") => {
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type === "error" ? "⚠️" : type === "success" ? "✅" : "ℹ️"}</span><span>${msg}</span>`;
+  $("#toast-container").appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+};
+
+const setCookie = (n, v, d = 30) => {
+  const e = new Date(); e.setDate(e.getDate() + d);
+  document.cookie = `${n}=${encodeURIComponent(v)}; expires=${e.toUTCString()}; path=/; SameSite=Strict`;
+};
+const getCookie = n => {
+  const match = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
+  return match ? decodeURIComponent(match.pop()) : null;
+};
+const escapeHtml = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
+
+// ==================== API KEY VALIDATION (FIXED) ====================
+const isValidApiKey = (key) => {
+  // Remove all whitespace
+  const k = key.trim();
+  // Must be at least 20 characters (Mistral keys are typically 32-64 chars)
+  if (k.length < 20) return false;
+  // Accept multiple possible prefixes or just alphanumeric patterns
+  const validPatterns = [
+    /^sk-[A-Za-z0-9]{20,}$/,      // OpenAI-style
+    /^mistral-[A-Za-z0-9]{20,}$/, // Mistral-style
+    /^[A-Za-z0-9\-_]{20,}$/        // Generic alphanumeric with dashes/underscores
+  ];
+  return validPatterns.some(pattern => pattern.test(k));
+};
+
+// ==================== INDEXEDDB ====================
+const db = {
+  open: () => new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      ['chats', 'agents', 'settings', 'global_memory'].forEach(store => {
+        if (!d.objectStoreNames.contains(store)) d.createObjectStore(store, { keyPath: 'id' });
+      });
+    };
+    req.onsuccess = e => { db.conn = e.target.result; res(db.conn); };
+    req.onerror = e => rej(e.target.error);
+  }),
+  put: (store, data) => new Promise((res, rej) => {
+    const tx = db.conn.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).put(data);
+    req.onsuccess = () => res(); req.onerror = e => rej(e.target.error);
+  }),
+  get: (store, id) => new Promise((res, rej) => {
+    const tx = db.conn.transaction(store, 'readonly');
+    const req = tx.objectStore(store).get(id);
+    req.onsuccess = () => res(req.result); req.onerror = e => rej(e.target.error);
+  }),
+  getAll: store => new Promise((res, rej) => {
+    const tx = db.conn.transaction(store, 'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = () => res(req.result); req.onerror = e => rej(e.target.error);
+  }),
+  delete: (store, id) => new Promise((res, rej) => {
+    const tx = db.conn.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).delete(id);
+    req.onsuccess = () => res(); req.onerror = e => rej(e.target.error);
+  })
+};
+
+// ==================== MEMORY SYSTEM ====================
+const memory = {
+  add: async (content, tags = []) => {
+    const entry = { id: uuid(), content, tags: Array.isArray(tags) ? tags : (tags||"").split(',').map(t => t.trim()).filter(Boolean), created: now(), importance: 1 };
+    await db.put('global_memory', entry);
+    state.globalMemories.push(entry);
+    renderMemoryList();
+    return entry;
+  },
+  getAll: async () => {
+    state.globalMemories = await db.getAll('global_memory') || [];
+    renderMemoryList();
+  },
+  clear: async () => {
+    const memories = await db.getAll('global_memory') || [];
+    for (const m of memories) await db.delete('global_memory', m.id);
+    state.globalMemories = [];
+    renderMemoryList();
+    toast("Global memory cleared", "success");
+  },
+  getRelevant: (query, limit = 5) => {
+    if (!state.globalMemories?.length) return [];
+    const q = query.toLowerCase();
+    return state.globalMemories
+      .map(m => ({ ...m, score: (m.content.toLowerCase().includes(q) ? 2 : 0) + ((m.tags||[]).some(t => q.includes(t.toLowerCase())) ? 1 : 0) + (m.importance || 1) }))
+      .filter(m => m.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map(m => `[MEM:${(m.tags||[]).join(',')}] ${m.content}`);
+  }
+};
+
+function renderMemoryList() {
+  const list = $("#memory-list");
+  if (!state.globalMemories?.length) {
+    list.innerHTML = '<div style="color:var(--text-muted);font-size:13px">No memories yet</div>';
+    return;
+  }
+  list.innerHTML = state.globalMemories.slice(-10).reverse().map(m => `
+    <div class="memory-item">
+      <div class="content">${escapeHtml(m.content)}</div>
+      <div class="actions"><button onclick="memoryDelete('${m.id}')">✕</button></div>
+    </div>
+  `).join('');
+}
+
+window.memoryDelete = async (id) => {
+  await db.delete('global_memory', id);
+  state.globalMemories = (state.globalMemories || []).filter(m => m.id !== id);
+  renderMemoryList();
+};
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', async () => {
+  try { await db.open(); } catch(e) { console.error("DB init:", e); }
+  
+  // Theme
+  try {
+    const savedTheme = await db.get('settings', 'theme');
+    if (savedTheme) document.documentElement.dataset.theme = savedTheme.value;
+  } catch(e) {}
+  $("#theme-select").value = document.documentElement.dataset.theme;
+  
+  // Models
+  const modelSel = $("#model-select");
+  MODELS.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = `✦ ${m.name}`;
+    opt.title = `${m.desc} • ${m.ctx} ctx • ${m.tokens.toLocaleString()} tokens`;
+    modelSel.appendChild(opt);
+  });
+  try {
+    const savedModel = await db.get('settings', 'model');
+    if (savedModel) { state.model = savedModel.value; modelSel.value = state.model; }
+  } catch(e) {}
+  
+  // API Key - FIXED VALIDATION
+  const cookieKey = getCookie("mistral_api_key");
+  if (cookieKey && isValidApiKey(cookieKey)) {
+    state.apiKey = cookieKey;
+    $("#api-status").textContent = "🟢 API: Active";
+    $("#api-status").className = "status-badge active";
+    $("#open-api-modal").textContent = "🔄 Change Key";
+  }
+  
+  // Load memories & agents
+  await memory.getAll();
+  await loadAgents();
+  
+  // Start chat
+  try {
+    const savedChatId = await db.get('settings', 'currentChatId');
+    if (savedChatId && savedChatId.value) await loadChat(savedChatId.value);
+    else await newChat();
+  } catch(e) { await newChat(); }
+  
+  bindEvents();
+});
+
+// ==================== CHAT LOGIC ====================
+async function newChat() {
+  state.chatId = uuid();
+  state.messages = [{ role: "system", content: buildSystemPrompt(), ts: now() }];
+  await saveChat();
+  try { await db.put('settings', { key: 'currentChatId', value: state.chatId }); } catch(e) {}
+  renderMessages();
+}
+
+async function loadChat(id) {
+  try {
+    const chat = await db.get('chats', id);
+    if (!chat) return;
+    state.chatId = id;
+    state.messages = chat.messages || [];
+    state.model = chat.model || state.model;
+    $("#model-select").value = state.model;
+    if (chat.agentId) {
+      try {
+        const ag = await db.get('agents', chat.agentId);
+        if (ag) { state.agent = ag; $("#agent-select").value = ag.id; }
+      } catch(e) {}
+    }
+    renderMessages();
+  } catch(e) { console.error("loadChat:", e); }
+}
+
+function buildSystemPrompt() {
+  let prompt = "You are a helpful, concise AI assistant integrated into NEXUS interface.";
+  if (state.agent) {
+    prompt += `\n\n[AGENT: ${state.agent.name}]\nRole: ${state.agent.desc || ''}`;
+    if (state.agent.instructions) prompt += `\nInstructions: ${state.agent.instructions}`;
+    if (state.agent.price > 0) prompt += `\nNote: This agent is valued at €${state.agent.price} for premium tasks.`;
+  }
+  const relevant = memory.getRelevant("context", 3);
+  if (relevant.length) prompt += `\n\n[GLOBAL MEMORY CONTEXT]\n${relevant.join('\n')}`;
+  prompt += "\n\nRespond in the user's language. Be precise, professional, and reference relevant memories when helpful.";
+  return prompt;
+}
+
+function renderMessages() {
+  const c = $("#chat-container");
+  c.innerHTML = "";
+  (state.messages || []).filter(m => m.role !== "system").forEach(m => {
+    const div = document.createElement("div");
+    div.className = `message ${m.role}`;
+    const memTags = m.memoryUsed?.length ? `<span class="memory-tag">🧠 ${m.memoryUsed.length}</span>` : '';
+    div.innerHTML = `<div class="message-content">${escapeHtml(m.content || '')}</div><div class="meta"><span>${new Date(m.ts).toLocaleTimeString()}</span>${memTags}</div>`;
+    c.appendChild(div);
+  });
+  c.scrollTop = c.scrollHeight;
+}
+
+async function saveChat() {
+  if (!state.chatId) return;
+  try {
+    await db.put('chats', {
+      id: state.chatId, model: state.model, agentId: state.agent?.id,
+      messages: state.messages,
+      title: (state.messages || []).slice(1).find(m => m.role === 'user')?.content?.slice(0, 40) || "New Chat",
+      updated: now()
+    });
+  } catch(e) { console.error("saveChat:", e); }
+}
+
+async function sendMessage() {
+  const txt = $("#user-input").value.trim();
+  if (!txt) return;
+  if (!state.apiKey) { toast("Please configure your API key first", "error"); $("#api-modal").classList.add("active"); return; }
+  
+  state.messages.push({ role: "user", content: txt, ts: now() });
+  renderMessages();
+  $("#user-input").value = "";
+  $("#send-btn").disabled = true;
+  $("#send-btn").innerHTML = '<span class="loading"></span>';
+  await saveChat();
+  
+  const relevantMems = memory.getRelevant(txt, 4);
+  
+  try {
+    const contextMessages = [
+      { role: "system", content: buildSystemPrompt() },
+      ...(state.messages || []).slice(-20).map(m => ({ role: m.role, content: m.content }))
+    ];
+    if (relevantMems.length) {
+      contextMessages.splice(1, 0, { role: "user", content: `[Context from Global Memory]\n${relevantMems.join('\n')}\n\nContinue the conversation:` });
+    }
+    const model = MODELS.find(m => m.id === state.model) || MODELS[11];
+    const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${state.apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ model: state.model, messages: contextMessages, temperature: model.temp, max_tokens: 4096, top_p: 0.95 })
+    });
+    if (!res.ok) { const err = await res.text(); throw new Error(err.slice(0, 200)); }
+    const data = await res.json();
+    const reply = data.choices?.[0]?.message?.content || "No response";
+    state.messages.push({ role: "assistant", content: reply, ts: now(), memoryUsed: relevantMems.length ? relevantMems : undefined });
+    renderMessages();
+    await saveChat();
+  } catch (e) {
+    toast(`API Error: ${e.message}`, "error");
+    state.messages.push({ role: "assistant", content: `⚠️ Request failed: ${e.message}`, ts: now() });
+    renderMessages();
+  } finally {
+    $("#send-btn").disabled = false;
+    $("#send-btn").textContent = "Send ➤";
+  }
+}
+
+// ==================== AGENTS ====================
+async function loadAgents() {
+  try {
+    const agents = await db.getAll('agents') || [];
+    const sel = $("#agent-select");
+    sel.innerHTML = '<option value="">🤖 Select Agent</option>';
+    agents.forEach(a => {
+      const opt = document.createElement("option");
+      opt.value = a.id;
+      const price = a.price > 0 ? ` • €${a.price}` : '';
+      opt.textContent = `✦ ${a.name}${price}`;
+      opt.title = a.desc;
+      sel.appendChild(opt);
+    });
+  } catch(e) { console.error("loadAgents:", e); }
+}
+
+// ==================== EVENTS ====================
+function bindEvents() {
+  $("#send-btn").onclick = sendMessage;
+  $("#user-input").onkeydown = e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+  $("#clear-chat").onclick = async () => { state.messages = (state.messages || []).filter(m => m.role === "system"); renderMessages(); await saveChat(); toast("Chat cleared", "success"); };
+  $("#new-chat").onclick = newChat;
+  $("#model-select").onchange = e => { state.model = e.target.value; db.put('settings', { key: 'model', value: state.model }).catch(()=>{}); const sys = (state.messages||[]).find(m => m.role === "system"); if (sys) { sys.content = buildSystemPrompt(); saveChat(); } };
+  $("#agent-select").onchange = async e => {
+    try {
+      state.agent = e.target.value ? await db.get('agents', e.target.value) : null;
+      const sys = (state.messages||[]).find(m => m.role === "system");
+      if (sys) { sys.content = buildSystemPrompt(); await saveChat(); renderMessages(); }
+    } catch(err) { console.error("agent change:", err); }
+  };
+  $("#theme-select").onchange = e => { document.documentElement.dataset.theme = e.target.value; db.put('settings', { key: 'theme', value: e.target.value }).catch(()=>{}); };
+  
+  // API Modal - FIXED
+  $("#open-api-modal").onclick = () => $("#api-modal").classList.add("active");
+  $("#close-api-modal").onclick = () => $("#api-modal").classList.remove("active");
+  $("#save-api-key").onclick = () => {
+    const k = $("#api-key-input").value.trim();
+    // FIXED: Use flexible validation
+    if (!isValidApiKey(k)) {
+      return toast("Invalid key format. Must be 20+ chars, usually starts with 'sk-' or 'mistral-'", "error");
+    }
+    setCookie("mistral_api_key", k);
+    state.apiKey = k;
+    $("#api-status").textContent = "🟢 API: Active";
+    $("#api-status").className = "status-badge active";
+    $("#api-modal").classList.remove("active");
+    toast("API key saved successfully!", "success");
+  };
+  
+  // Agent Modal
+  $("#open-agent-modal").onclick = () => $("#agent-modal").classList.add("active");
+  $("#close-agent-modal").onclick = () => $("#agent-modal").classList.remove("active");
+  $("#save-agent").onclick = async () => {
+    const name = $("#agent-name").value.trim();
+    const desc = $("#agent-desc").value.trim();
+    if (!name || !desc) return toast("Name and description required", "error");
+    const agent = {
+      id: uuid(), name, desc,
+      price: parseFloat($("#agent-price").value) || 0,
+      tags: ($("#agent-tags").value || "").split(',').map(t => t.trim()).filter(Boolean),
+      instructions: $("#agent-instructions").value.trim(),
+      created: now()
+    };
+    await db.put('agents', agent);
+    $("#agent-modal").classList.remove("active");
+    await loadAgents();
+    $("#agent-select").value = agent.id;
+    state.agent = agent;
+    const sys = (state.messages||[]).find(m => m.role === "system");
+    if (sys) { sys.content = buildSystemPrompt(); await saveChat(); renderMessages(); }
+    toast(`Agent "${name}" created!`, "success");
+    $("#agent-name").value = ""; $("#agent-desc").value = ""; $("#agent-price").value = ""; $("#agent-tags").value = ""; $("#agent-instructions").value = "";
+  };
+  
+  // Memory Panel
+  $("#memory-toggle").onclick = () => $("#memory-panel").classList.toggle("active");
+  $("#memory-add").onclick = async () => {
+    const txt = $("#memory-input").value.trim();
+    if (!txt) return;
+    await memory.add(txt);
+    $("#memory-input").value = "";
+    toast("Memory added", "success");
+    const sys = (state.messages||[]).find(m => m.role === "system");
+    if (sys) { sys.content = buildSystemPrompt(); await saveChat(); }
+  };
+  $("#memory-input").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); $("#memory-add").click(); } };
+  $("#memory-clear").onclick = async () => { if (confirm("Clear all global memories?")) await memory.clear(); };
+}
+</script>
+</body>
+</html>
