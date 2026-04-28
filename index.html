@@ -547,6 +547,107 @@ body::before {
 }
 .memory-input button:hover { background: rgba(0,229,255,0.2); }
 
+/* ═══ ARCHIVES PANEL ═══ */
+#archives-btn {
+  position: fixed;
+  left: 16px;
+  bottom: 80px;
+  z-index: 200;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--cyan);
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px var(--cyan-dim);
+  transition: var(--transition);
+}
+#archives-btn:hover { box-shadow: 0 0 25px var(--cyan-glow); border-color: var(--cyan); }
+#archives-panel {
+  position: fixed;
+  left: 16px;
+  bottom: 130px;
+  width: 290px;
+  background: rgba(9,21,37,0.97);
+  border: var(--hud-border);
+  border-radius: var(--r-lg);
+  z-index: 199;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6), 0 0 20px var(--cyan-dim);
+  transform: translateX(calc(-100% - 20px));
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  max-height: 70vh;
+}
+#archives-panel.active { transform: translateX(0); }
+.archives-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: var(--border);
+  flex-shrink: 0;
+}
+.archives-header h3 { font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--cyan); }
+.archives-search { padding: 8px 10px; border-bottom: var(--border); flex-shrink: 0; }
+.archives-search input {
+  width: 100%;
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: var(--r);
+  outline: none;
+}
+.archives-search input:focus { border-color: var(--cyan); }
+.archives-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+.archive-item {
+  padding: 9px 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  border-bottom: 1px solid var(--grid);
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+}
+.archive-item:last-child { border-bottom: none; }
+.archive-item:hover { background: var(--hull); }
+.archive-item.active-chat { border-left: 2px solid var(--cyan); background: var(--cyan-dim); }
+.archive-item-icon { color: var(--cyan); font-size: 11px; flex-shrink: 0; margin-top: 2px; opacity: 0.6; }
+.archive-item-content { flex: 1; min-width: 0; }
+.archive-item-title { font-family: var(--font-mono); font-size: 11px; color: var(--text-bright); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+.archive-item-meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); display: flex; gap: 8px; }
+.archive-item-del { background: transparent; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 4px; font-size: 10px; border-radius: 3px; transition: var(--transition); flex-shrink: 0; }
+.archive-item-del:hover { color: var(--danger); }
+.archive-fav-btn { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 11px; padding: 2px; flex-shrink: 0; }
+.archive-fav-btn.fav { color: var(--gold); }
+.archive-empty { padding: 20px 14px; text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+
+/* ═══ MESSAGE ACTIONS ═══ */
+.msg-actions { display: none; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
+.message:hover .msg-actions { display: flex; }
+.msg-action-btn { background: transparent; border: 1px solid var(--wire); color: var(--text-dim); font-family: var(--font-mono); font-size: 9px; padding: 2px 7px; border-radius: 3px; cursor: pointer; transition: var(--transition); letter-spacing: 0.5px; }
+.msg-action-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+
+/* ═══ VOICE BUTTON ═══ */
+#voice-btn { background: var(--hull); border: var(--hud-border); color: var(--text-dim); font-size: 16px; width: 46px; height: 46px; border-radius: var(--r-lg); cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; flex-shrink: 0; align-self: flex-end; }
+#voice-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+#voice-btn.recording { border-color: var(--danger); color: var(--danger); animation: pulse-border 1s infinite; background: rgba(255,51,102,0.1); }
+@keyframes pulse-border { 0%,100%{box-shadow:0 0 0 0 rgba(255,51,102,0.4)}50%{box-shadow:0 0 0 6px rgba(255,51,102,0)} }
+
+/* ═══ SCROLL TO BOTTOM ═══ */
+#scroll-bottom { position: fixed; right: 68px; bottom: 80px; z-index: 200; width: 34px; height: 34px; border-radius: 50%; background: var(--hull); border: var(--hud-border); color: var(--cyan); font-size: 14px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0,0,0,0.4); transition: var(--transition); }
+#scroll-bottom.visible { display: flex; }
+#scroll-bottom:hover { border-color: var(--cyan); box-shadow: 0 0 15px var(--cyan-glow); }
+
 /* ═══ MODALS ═══ */
 .modal-overlay {
   position: fixed;
@@ -1034,7 +1135,8 @@ body::before {
   #burger-btn { display: flex; }
   #chat-container { padding: 14px 12px; }
   .message { max-width: 95%; }
-  #memory-panel { width: calc(100% - 32px); right: 16px; bottom: 110px; }
+  #memory-panel { width: calc(100% - 90px); right: 16px; bottom: 110px; left: auto; }
+  #archives-panel { width: calc(100% - 32px); left: 16px; bottom: 110px; max-height: 65vh; }
   .modal-overlay { padding: 0; align-items: flex-end; }
   .modal-box { max-height: 92dvh; border-radius: var(--r-lg) var(--r-lg) 0 0; max-width: 100%; }
   @keyframes modalIn {
@@ -1042,7 +1144,12 @@ body::before {
     to { opacity: 1; transform: translateY(0); }
   }
   .data-grid { grid-template-columns: 1fr 1fr; }
-  #input-area { padding: 10px 12px; }
+  #input-area { padding: 8px 10px; gap: 7px; }
+  #send-btn { padding: 10px 14px; font-size: 12px; }
+  #voice-btn { width: 40px; height: 40px; font-size: 14px; }
+  #scroll-bottom { right: 58px; bottom: 75px; }
+  #archives-btn { left: 62px; }
+  #memory-toggle { right: 16px; }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -1118,6 +1225,7 @@ body::before {
     </select>
     <button class="hud-btn" id="clear-chat">⌫ CLEAR</button>
     <button class="hud-btn" id="new-chat">+ NEW</button>
+    <button class="hud-btn" id="open-archives-desktop">⬡ ARCHIVES</button>
   </div>
 
   <div class="header-right">
@@ -1163,6 +1271,7 @@ body::before {
   <div class="mobile-row">
     <button class="hud-btn" id="clear-chat-mob" style="flex:1">⌫ CLEAR</button>
     <button class="hud-btn" id="new-chat-mob" style="flex:1">+ NEW CHAT</button>
+    <button class="hud-btn" id="archives-mob" style="flex:1">⬡ ARCHIVES</button>
   </div>
 </div>
 
@@ -1170,10 +1279,27 @@ body::before {
 <main id="chat-container"></main>
 
 <!-- ═══════════════════ INPUT ═══════════════════ -->
-<div id="input-area">
+<div id="input-area" style="position:relative">
+  <button id="voice-btn" title="Dictée vocale">🎤</button>
   <textarea id="user-input" placeholder="Transmettez votre message… (Entrée pour envoyer, Maj+Entrée pour nouvelle ligne)" rows="1"></textarea>
   <button id="send-btn">SEND ▶</button>
 </div>
+
+<!-- ═══════════════════ ARCHIVES ═══════════════════ -->
+<button id="archives-btn" title="Archives des conversations">⬡</button>
+<div id="archives-panel">
+  <div class="archives-header">
+    <h3>⬡ ARCHIVES</h3>
+    <button class="btn-ghost" id="archives-new-btn" style="padding:3px 8px;font-size:9px;border-radius:3px;letter-spacing:1px">+ NOUVEAU</button>
+  </div>
+  <div class="archives-search">
+    <input type="text" id="archives-search-input" placeholder="Rechercher une conversation…">
+  </div>
+  <div class="archives-list" id="archives-list">
+    <div class="archive-empty">Aucune conversation sauvegardée</div>
+  </div>
+</div>
+<button id="scroll-bottom" title="Descendre">↓</button>
 
 <!-- ═══════════════════ MEMORY ═══════════════════ -->
 <button id="memory-toggle" title="Mémoire Globale">⬡</button>
@@ -1210,6 +1336,7 @@ body::before {
       </div>
       <div class="btn-row" style="margin-top:0;padding-top:0;border-top:none;margin-bottom:20px">
         <button class="btn-ghost" id="close-api-modal-2">Annuler</button>
+        <button class="btn-ghost danger" id="delete-api-key" style="border-color:rgba(255,51,102,0.3);color:var(--danger)">🗑 SUPPRIMER</button>
         <button class="btn-primary" id="save-api-key">💾 ENREGISTRER ET ACTIVER</button>
       </div>
 
@@ -1238,8 +1365,8 @@ body::before {
       </ol>
 
       <div class="success-block">
-        <strong>🔒 Sécurité locale garantie</strong><br>
-        Votre clé API est stockée dans un cookie sécurisé de votre navigateur. Elle n'est jamais transmise à aucun serveur tiers — uniquement envoyée directement à <code style="font-size:11px;color:var(--neon)">api.mistral.ai</code>.
+        <strong>🔒 Persistance garantie 365 jours</strong><br>
+        Votre clé API est stockée dans un cookie sécurisé <strong>ET</strong> dans le stockage local de votre navigateur. Elle est automatiquement restaurée à chaque visite et n'est jamais transmise à aucun serveur tiers — uniquement envoyée directement à <code style="font-size:11px;color:var(--neon)">api.mistral.ai</code>.
       </div>
 
       <div style="margin-top:12px;font-size:12px;color:var(--text-dim);text-align:center">
@@ -1466,13 +1593,26 @@ const toast = (msg, type = "info") => {
   setTimeout(() => t.remove(), 3800);
 };
 
-const setCookie = (n, v, d = 60) => {
-  const e = new Date(); e.setDate(e.getDate() + d);
-  document.cookie = `${n}=${encodeURIComponent(v)};expires=${e.toUTCString()};path=/;SameSite=Strict`;
+// Stockage persistant API key : cookie 365j + localStorage fallback
+const setCookie = (n, v, d = 365) => {
+  try {
+    const e = new Date(); e.setDate(e.getDate() + d);
+    document.cookie = `${n}=${encodeURIComponent(v)};expires=${e.toUTCString()};path=/;SameSite=Strict`;
+  } catch(err) {}
+  try { localStorage.setItem('voanh_' + n, v); } catch(err) {}
 };
 const getCookie = n => {
-  const m = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
-  return m ? decodeURIComponent(m.pop()) : null;
+  // Priorité : cookie, puis localStorage
+  try {
+    const m = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
+    if (m) return decodeURIComponent(m.pop());
+  } catch(err) {}
+  try { const v = localStorage.getItem('voanh_' + n); if (v) return v; } catch(err) {}
+  return null;
+};
+const deleteCookie = n => {
+  try { document.cookie = `${n}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;SameSite=Strict`; } catch(err) {}
+  try { localStorage.removeItem('voanh_' + n); } catch(err) {}
 };
 
 const isValidApiKey = k => {
@@ -1583,6 +1723,25 @@ window.memoryDelete = async id => {
   renderMemoryList();
 };
 
+window.copyMsg = ts => {
+  const el = document.getElementById('mc-' + ts);
+  if (!el) return;
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => toast("Message copié !", "success")).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    toast("Message copié !", "success");
+  });
+};
+
+window.saveToMemory = async ts => {
+  const el = document.getElementById('mc-' + ts);
+  if (!el) return;
+  const text = (el.innerText || el.textContent).slice(0, 200);
+  await memory.add(text);
+  toast("Ajouté à la mémoire globale", "success");
+};
+
 // ════════════════════════════════════════
 // CHAT RENDERING
 // ════════════════════════════════════════
@@ -1606,12 +1765,17 @@ function renderMessages() {
     div.className = `message ${m.role}`;
     const memTags = m.memoryUsed?.length ? `<span class="mem-tag">⬡ MEM×${m.memoryUsed.length}</span>` : '';
     const label = m.role === 'user' ? '▸ VOUS' : `▸ ${state.agent ? state.agent.name.toUpperCase() : 'VOANH'}`;
+    const msgId = m.ts || Date.now();
     div.innerHTML = `
       <div class="msg-label">${label}</div>
-      <div class="message-content">${escapeHtml(m.content || '')}</div>
+      <div class="message-content" id="mc-${msgId}">${escapeHtml(m.content || '')}</div>
       <div class="msg-meta">
         <span>${new Date(m.ts).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
         ${memTags}
+      </div>
+      <div class="msg-actions">
+        <button class="msg-action-btn" onclick="copyMsg(${msgId})">⎘ COPIER</button>
+        ${m.role==='assistant'?`<button class="msg-action-btn" onclick="saveToMemory(${msgId})">⬡ MÉMO</button>`:''}
       </div>`;
     c.appendChild(div);
   });
@@ -1649,19 +1813,88 @@ function buildSystemPrompt() {
 }
 
 // ════════════════════════════════════════
+// ARCHIVES
+// ════════════════════════════════════════
+let archivesSearchQuery = "";
+
+async function renderArchives() {
+  const list = $("#archives-list");
+  if (!list) return;
+  try {
+    let chats = await db.getAll('chats') || [];
+    chats = chats.sort((a, b) => (b.updated||0) - (a.updated||0));
+    if (archivesSearchQuery) {
+      const q = archivesSearchQuery.toLowerCase();
+      chats = chats.filter(c => (c.title||"").toLowerCase().includes(q) ||
+        (c.messages||[]).some(m => (m.content||"").toLowerCase().includes(q)));
+    }
+    if (!chats.length) {
+      list.innerHTML = '<div class="archive-empty">Aucune conversation trouvée</div>';
+      return;
+    }
+    list.innerHTML = chats.map(c => {
+      const isActive = c.id === state.chatId;
+      const isFav = c.fav ? true : false;
+      const msgCount = (c.messages||[]).filter(m=>m.role!=='system').length;
+      const date = c.updated ? new Date(c.updated).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+      return `<div class="archive-item${isActive?' active-chat':''}" onclick="loadArchiveChat('${c.id}')">
+        <span class="archive-item-icon">${isFav?'★':'◈'}</span>
+        <div class="archive-item-content">
+          <div class="archive-item-title">${escapeHtml(c.title||'Sans titre')}</div>
+          <div class="archive-item-meta">
+            <span>${msgCount} msg</span>
+            <span>${date}</span>
+          </div>
+        </div>
+        <button class="archive-fav-btn${isFav?' fav':''}" onclick="event.stopPropagation();toggleFav('${c.id}')" title="${isFav?'Retirer favoris':'Ajouter favoris'}">${isFav?'★':'☆'}</button>
+        <button class="archive-item-del" onclick="event.stopPropagation();deleteArchiveChat('${c.id}')" title="Supprimer">✕</button>
+      </div>`;
+    }).join('');
+  } catch(e) { list.innerHTML = '<div class="archive-empty">Erreur de chargement</div>'; }
+}
+
+window.loadArchiveChat = async id => {
+  await loadChat(id);
+  $("#archives-panel").classList.remove("active");
+  await renderArchives();
+  toast("Conversation chargée", "success");
+};
+
+window.deleteArchiveChat = async id => {
+  if (!confirm("Supprimer cette conversation ?")) return;
+  await db.delete('chats', id);
+  if (state.chatId === id) await newChat();
+  await renderArchives();
+  toast("Conversation supprimée", "success");
+};
+
+window.toggleFav = async id => {
+  try {
+    const chat = await db.get('chats', id);
+    if (!chat) return;
+    chat.fav = !chat.fav;
+    await db.put('chats', chat);
+    await renderArchives();
+  } catch(e) {}
+};
+
+// ════════════════════════════════════════
 // SAVE / LOAD CHAT
 // ════════════════════════════════════════
 async function saveChat() {
   if (!state.chatId) return;
   try {
+    const existingChat = await db.get('chats', state.chatId).catch(() => null);
     await db.put('chats', {
       id: state.chatId,
       model: state.model,
       agentId: state.agent?.id,
       messages: state.messages,
       title: (state.messages||[]).slice(1).find(m=>m.role==='user')?.content?.slice(0,50) || "Nouvelle conversation",
-      updated: now()
+      updated: now(),
+      fav: existingChat?.fav || false
     });
+    renderArchives();
   } catch(e) { console.error("saveChat:", e); }
 }
 
@@ -1950,6 +2183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Memories & agents
   await memory.getAll();
   await loadAgents();
+  await renderArchives();
 
   // Chat
   try {
@@ -1965,12 +2199,79 @@ document.addEventListener('DOMContentLoaded', async () => {
 // EVENTS
 // ════════════════════════════════════════
 function bindEvents() {
+  // Archives panel
+  const archivesBtn = $("#archives-btn");
+  const archivesPanel = $("#archives-panel");
+  if (archivesBtn && archivesPanel) {
+    archivesBtn.onclick = e => {
+      e.stopPropagation();
+      archivesPanel.classList.toggle("active");
+      if (archivesPanel.classList.contains("active")) renderArchives();
+    };
+    document.addEventListener('click', e => {
+      if (archivesPanel.classList.contains("active") && !archivesPanel.contains(e.target) && e.target !== archivesBtn) {
+        archivesPanel.classList.remove("active");
+      }
+    });
+  }
+  if ($("#archives-new-btn")) {
+    $("#archives-new-btn").onclick = e => { e.stopPropagation(); newChat(); $("#archives-panel").classList.remove("active"); };
+  }
+  if ($("#archives-search-input")) {
+    $("#archives-search-input").oninput = e => { archivesSearchQuery = e.target.value; renderArchives(); };
+    $("#archives-search-input").onclick = e => e.stopPropagation();
+  }
+
+  // Scroll to bottom
+  const scrollBottomBtn = $("#scroll-bottom");
+  const chatContainer = $("#chat-container");
+  if (scrollBottomBtn && chatContainer) {
+    chatContainer.addEventListener('scroll', () => {
+      const distFromBottom = chatContainer.scrollHeight - chatContainer.scrollTop - chatContainer.clientHeight;
+      scrollBottomBtn.classList.toggle("visible", distFromBottom > 150);
+    });
+    scrollBottomBtn.onclick = () => { chatContainer.scrollTop = chatContainer.scrollHeight; };
+  }
+
+  // Voice dictation
+  const voiceBtn = $("#voice-btn");
+  if (voiceBtn && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SR();
+    recognition.lang = 'fr-FR'; recognition.continuous = false; recognition.interimResults = false;
+    let isRecording = false;
+    voiceBtn.onclick = () => {
+      if (isRecording) { recognition.stop(); return; }
+      recognition.start();
+      isRecording = true;
+      voiceBtn.classList.add("recording");
+      voiceBtn.title = "Arrêter la dictée";
+    };
+    recognition.onresult = e => {
+      const transcript = Array.from(e.results).map(r=>r[0].transcript).join('');
+      const inp = $("#user-input");
+      inp.value += (inp.value ? ' ' : '') + transcript;
+      autoResizeTextarea();
+    };
+    recognition.onend = () => { isRecording = false; voiceBtn.classList.remove("recording"); voiceBtn.title = "Dictée vocale"; };
+    recognition.onerror = () => { isRecording = false; voiceBtn.classList.remove("recording"); toast("Dictée vocale indisponible", "error"); };
+  } else if (voiceBtn) {
+    voiceBtn.style.display = "none";
+  }
+
   // Send
   $("#send-btn").onclick = sendMessage;
   $("#user-input").oninput = autoResizeTextarea;
   $("#user-input").onkeydown = e => {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
   };
+
+  if ($("#open-archives-desktop")) {
+    $("#open-archives-desktop").onclick = () => {
+      $("#archives-panel").classList.toggle("active");
+      if ($("#archives-panel").classList.contains("active")) renderArchives();
+    };
+  }
 
   // Chat controls
   $("#clear-chat").onclick = async () => {
@@ -2005,7 +2306,13 @@ function bindEvents() {
   };
 
   // API Modal
-  $("#open-api-modal").onclick = () => $("#api-modal").classList.add("active");
+  $("#open-api-modal").onclick = () => {
+    if (state.apiKey) {
+      // Pre-fill with current key (masked display via type=password)
+      $("#api-key-input").value = state.apiKey;
+    }
+    $("#api-modal").classList.add("active");
+  };
   const closeApiModal = () => $("#api-modal").classList.remove("active");
   $("#close-api-modal").onclick = closeApiModal;
   if ($("#close-api-modal-2")) $("#close-api-modal-2").onclick = closeApiModal;
@@ -2021,9 +2328,22 @@ function bindEvents() {
     state.apiKey = k;
     $("#api-status").innerHTML = '<span class="status-dot"></span>ONLINE';
     $("#api-status").className = "status-pill active";
+    if ($("#api-status-mob")) { $("#api-status-mob").innerHTML = '<span class="status-dot"></span>ONLINE'; $("#api-status-mob").className = "status-pill active"; }
     closeApiModal();
-    toast("Clé API activée avec succès !", "success");
+    toast("Clé API activée — persistante 365 jours !", "success");
   };
+
+  if ($("#delete-api-key")) {
+    $("#delete-api-key").onclick = () => {
+      if (!confirm("Supprimer votre clé API sauvegardée ?")) return;
+      deleteCookie("mistral_api_key");
+      state.apiKey = null;
+      $("#api-key-input").value = "";
+      $("#api-status").innerHTML = '<span class="status-dot"></span>OFFLINE';
+      $("#api-status").className = "status-pill";
+      toast("Clé API supprimée", "success");
+    };
+  }
 
   // Agent Modal
   const openAgentModal = async () => {
@@ -2263,6 +2583,7 @@ function bindEvents() {
     if ($("#open-agent-modal-mob")) $("#open-agent-modal-mob").onclick = async () => { closeBurger(); await loadAgents(); $("#agent-modal").classList.add("active"); };
     // Mobile Data modal
     if ($("#open-data-modal-mob")) $("#open-data-modal-mob").onclick = async () => { closeBurger(); await computeStats(); $("#data-modal").classList.add("active"); };
+    if ($("#archives-mob")) $("#archives-mob").onclick = () => { closeBurger(); $("#archives-panel").classList.toggle("active"); if ($("#archives-panel").classList.contains("active")) renderArchives(); };
     // Mobile clear / new
     if ($("#clear-chat-mob")) $("#clear-chat-mob").onclick = () => { closeBurger(); $("#clear-chat").click(); };
     if ($("#new-chat-mob")) $("#new-chat-mob").onclick = () => { closeBurger(); newChat(); };
