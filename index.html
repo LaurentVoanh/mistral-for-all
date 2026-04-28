@@ -1,491 +1,1541 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="light">
+<html lang="fr" data-theme="cyber">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mistral Advanced Interface • NEXUS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>VOANH — Interface Mistral AI</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ═══════════════════════════════════════════
+   VOANH DESIGN SYSTEM — CYBER / 2ADVANCED
+   ═══════════════════════════════════════════ */
 :root {
-  --bg: #ffffff; --surface: #f8f9ff; --border: #e2e8f0; --text: #1e293b; --text-muted: #64748b;
-  --primary: #3b82f6; --primary-glow: rgba(59, 130, 246, 0.15); --accent: #8b5cf6;
-  --danger: #ef4444; --success: #10b981;
-  --shadow: 0 4px 20px rgba(0,0,0,0.06); --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
-  --radius: 14px; --radius-sm: 10px; --font: system-ui, -apple-system, sans-serif;
-  --transition: all 0.2s ease;
+  --void: #020509;
+  --deep: #050d18;
+  --hull: #091525;
+  --plate: #0d1e33;
+  --grid: #122540;
+  --wire: #1a3455;
+  --cyan: #00e5ff;
+  --cyan-dim: rgba(0, 229, 255, 0.15);
+  --cyan-glow: rgba(0, 229, 255, 0.35);
+  --neon: #00ff9d;
+  --neon-dim: rgba(0, 255, 157, 0.12);
+  --plasma: #ff6b35;
+  --plasma-dim: rgba(255, 107, 53, 0.15);
+  --violet: #7c3aed;
+  --violet-dim: rgba(124, 58, 237, 0.2);
+  --gold: #f59e0b;
+  --text: #b8d4f0;
+  --text-bright: #e8f4ff;
+  --text-dim: #4a6b8a;
+  --text-code: #00e5ff;
+  --danger: #ff3366;
+  --success: #00ff9d;
+  --warning: #f59e0b;
+  --font-display: 'Orbitron', monospace;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-body: 'Exo 2', sans-serif;
+  --r: 6px;
+  --r-lg: 12px;
+  --border: 1px solid var(--wire);
+  --border-cyan: 1px solid rgba(0,229,255,0.3);
+  --transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+  --scanline: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.015) 2px, rgba(0,229,255,0.015) 4px);
+  --hud-border: 1px solid rgba(0,229,255,0.2);
 }
-[data-theme="dark"] {
-  --bg: #0f172a; --surface: #1e293b; --border: #334155; --text: #f1f5f9; --text-muted: #94a3b8;
-  --primary: #60a5fa; --primary-glow: rgba(96, 165, 250, 0.2); --accent: #a78bfa;
-  --shadow: 0 4px 20px rgba(0,0,0,0.3); --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
+
+/* RESET */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: var(--wire); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan); }
+
+/* GLOBAL */
+html, body {
+  height: 100%;
+  overflow: hidden;
 }
-[data-theme="sand"] {
-  --bg: #faf7f2; --surface: #f0ebe3; --border: #d9d0c2; --text: #2d2a24; --text-muted: #7a7164;
-  --primary: #8c7b6b; --primary-glow: rgba(140, 123, 107, 0.15); --accent: #a68a64;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: var(--font); background: var(--bg); color: var(--text);
-  transition: var(--transition); height: 100vh; display: flex; flex-direction: column;
-  background-image: radial-gradient(circle at 20% 80%, var(--primary-glow) 0%, transparent 40%),
-                    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+  font-family: var(--font-body);
+  background: var(--void);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  background-image:
+    var(--scanline),
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,229,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 90% 80%, rgba(124,58,237,0.04) 0%, transparent 50%);
 }
-header {
-  padding: 14px 20px; background: var(--surface); border-bottom: 1px solid var(--border);
-  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow);
+
+/* ═══ GRID BACKGROUND ═══ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
 }
+
+/* ═══ HEADER ═══ */
+#voanh-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(5, 13, 24, 0.95);
+  border-bottom: var(--hud-border);
+  backdrop-filter: blur(20px);
+  padding: 0 20px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 0 rgba(0,229,255,0.1), 0 4px 30px rgba(0,0,0,0.5);
+}
+
 .brand {
-  display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
 }
-.brand-icon {
-  width: 32px; height: 32px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-weight: 700; font-size: 16px;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+.brand-logo {
+  width: 36px;
+  height: 36px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-select, button, input, textarea {
-  padding: 10px 14px; border: 1px solid var(--border); background: var(--bg);
-  color: var(--text); border-radius: var(--radius-sm); cursor: pointer;
-  font-size: 14px; font-family: var(--font); transition: var(--transition);
+.brand-logo svg {
+  width: 36px;
+  height: 36px;
+  filter: drop-shadow(0 0 6px rgba(0,229,255,0.8));
 }
-select:focus, input:focus, textarea:focus {
-  outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow);
+.brand-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  color: var(--text-bright);
+  text-shadow: 0 0 20px rgba(0,229,255,0.5);
 }
-button { font-weight: 500; }
-button.primary {
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: white; border: none; font-weight: 600;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+.brand-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--cyan);
+  letter-spacing: 3px;
+  margin-top: 2px;
+  opacity: 0.7;
 }
-button.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
-button.ghost { background: transparent; }
-button.ghost:hover { background: var(--surface); }
-.status-badge {
-  font-size: 12px; padding: 5px 10px; border-radius: 20px;
-  background: var(--surface); border: 1px solid var(--border);
-  display: flex; align-items: center; gap: 6px;
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  min-width: 0;
 }
-.status-badge.active { border-color: var(--success); color: var(--success); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ═══ HUD ELEMENTS ═══ */
+.hud-select {
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 10px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: var(--transition);
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  min-width: 0;
+}
+.hud-select:hover, .hud-select:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan-dim), inset 0 0 10px rgba(0,229,255,0.03);
+  color: var(--text-bright);
+}
+#model-select { max-width: 180px; }
+#agent-select { max-width: 160px; }
+
+.hud-btn {
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 12px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+.hud-btn:hover {
+  background: var(--plate);
+  border-color: rgba(0,229,255,0.5);
+  color: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan-dim);
+}
+.hud-btn.primary {
+  background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(0,255,157,0.08));
+  border-color: rgba(0,229,255,0.5);
+  color: var(--cyan);
+  font-weight: 600;
+}
+.hud-btn.primary:hover {
+  background: linear-gradient(135deg, rgba(0,229,255,0.25), rgba(0,255,157,0.15));
+  box-shadow: 0 0 15px var(--cyan-glow), inset 0 0 10px rgba(0,229,255,0.05);
+}
+.hud-btn.danger { border-color: rgba(255,51,102,0.4); color: var(--danger); }
+.hud-btn.danger:hover { box-shadow: 0 0 10px rgba(255,51,102,0.3); }
+.hud-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--text-dim);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.status-pill.active {
+  border-color: rgba(0,255,157,0.4);
+  color: var(--neon);
+  background: var(--neon-dim);
+}
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-pill.active .status-dot {
+  animation: pulse-dot 1.5s infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 4px currentColor; }
+  50% { opacity: 0.4; box-shadow: none; }
+}
+
+/* ═══ CHAT AREA ═══ */
 #chat-container {
-  flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 18px;
-  scroll-behavior: smooth;
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+  min-height: 0;
 }
+
+/* ═══ MESSAGES ═══ */
 .message {
-  max-width: 85%; padding: 14px 18px; border-radius: var(--radius);
-  line-height: 1.6; position: relative; animation: fadeUp 0.25s ease;
-  background: var(--surface); border: 1px solid var(--border);
+  max-width: 82%;
+  padding: 14px 18px;
+  border-radius: var(--r-lg);
+  line-height: 1.65;
+  position: relative;
+  animation: msgIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
 }
-@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .message.user {
-  align-self: flex-end; background: linear-gradient(135deg, var(--primary), var(--accent));
-  color: white; border: none; border-bottom-right-radius: 6px;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+  align-self: flex-end;
+  background: linear-gradient(135deg, rgba(0,229,255,0.12), rgba(0,255,157,0.06));
+  border: var(--border-cyan);
+  border-bottom-right-radius: 3px;
+  color: var(--text-bright);
+  box-shadow: 0 4px 20px rgba(0,229,255,0.1);
 }
-.message.assistant { align-self: flex-start; border-bottom-left-radius: 6px; }
+.message.user::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  border-radius: inherit;
+  background: linear-gradient(135deg, transparent 60%, rgba(0,229,255,0.05));
+  pointer-events: none;
+}
+
+.message.assistant {
+  align-self: flex-start;
+  background: var(--hull);
+  border: var(--border);
+  border-bottom-left-radius: 3px;
+  border-left: 2px solid rgba(0,229,255,0.3);
+}
+
 .message.system {
-  align-self: center; max-width: 90%; background: var(--bg);
-  font-size: 13px; color: var(--text-muted); border-style: dashed; text-align: center;
+  align-self: center;
+  max-width: 90%;
+  background: transparent;
+  border: 1px dashed var(--wire);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 8px 14px;
+  border-radius: 20px;
 }
-.message .meta {
-  font-size: 11px; opacity: 0.75; margin-top: 8px; padding-top: 8px;
-  border-top: 1px dashed var(--border); display: flex; justify-content: space-between;
+
+.msg-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 6px;
 }
-.message .memory-tag {
-  font-size: 10px; background: var(--accent); color: white;
-  padding: 2px 7px; border-radius: 5px; font-weight: 600;
+.message.user .msg-label { color: rgba(0,229,255,0.5); }
+
+.message-content {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: 14px;
 }
-.message-content { white-space: pre-wrap; word-wrap: break-word; }
+
+.msg-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--wire);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mem-tag {
+  font-size: 9px;
+  background: rgba(124,58,237,0.2);
+  border: 1px solid rgba(124,58,237,0.4);
+  color: #a78bfa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+}
+
+/* ═══ TYPING INDICATOR ═══ */
+.typing-indicator {
+  align-self: flex-start;
+  background: var(--hull);
+  border: var(--border);
+  border-left: 2px solid rgba(0,229,255,0.3);
+  padding: 14px 18px;
+  border-radius: var(--r-lg);
+  border-bottom-left-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: msgIn 0.25s ease;
+}
+.typing-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: typingBounce 1.2s infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-5px); opacity: 1; }
+}
+
+/* ═══ INPUT AREA ═══ */
 #input-area {
-  padding: 16px 20px; background: var(--surface); border-top: 1px solid var(--border);
-  display: flex; gap: 12px; position: sticky; bottom: 0;
+  background: rgba(5,13,24,0.95);
+  border-top: var(--hud-border);
+  padding: 12px 16px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-shrink: 0;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 -1px 0 rgba(0,229,255,0.08);
 }
-#input-area textarea {
-  flex: 1; resize: none; padding: 14px 18px; min-height: 52px; max-height: 180px;
-  line-height: 1.5; font-family: var(--font);
+#user-input {
+  flex: 1;
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--text-bright);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r-lg);
+  resize: none;
+  min-height: 46px;
+  max-height: 160px;
+  line-height: 1.5;
+  transition: var(--transition);
+  outline: none;
 }
-#send-btn { padding: 14px 24px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-#send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
-.modal {
-  position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6);
-  display: none; justify-content: center; align-items: center; z-index: 1000;
-  backdrop-filter: blur(6px);
+#user-input::placeholder { color: var(--text-dim); }
+#user-input:focus {
+  border-color: rgba(0,229,255,0.5);
+  box-shadow: 0 0 15px var(--cyan-dim), inset 0 0 15px rgba(0,229,255,0.02);
 }
-.modal.active { display: flex; animation: fadeIn 0.2s ease; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal-content {
-  background: var(--bg); padding: 26px; border-radius: var(--radius);
-  width: 90%; max-width: 640px; box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border); max-height: 90vh; overflow-y: auto;
-  animation: slideUp 0.25s ease;
+#send-btn {
+  background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(0,255,157,0.1));
+  border: var(--border-cyan);
+  color: var(--cyan);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  letter-spacing: 1px;
+  flex-shrink: 0;
+  align-self: flex-end;
 }
-@keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-.modal h2 {
-  margin-bottom: 18px; font-size: 19px; display: flex; align-items: center; gap: 9px;
-  color: var(--primary);
+#send-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(0,229,255,0.3), rgba(0,255,157,0.2));
+  box-shadow: 0 0 20px var(--cyan-glow);
+  transform: translateY(-1px);
 }
-.info-card {
-  background: var(--surface); padding: 15px; border-radius: var(--radius-sm);
-  margin-bottom: 18px; border-left: 3px solid var(--primary);
-  font-size: 14px; line-height: 1.6;
+#send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ═══ MEMORY PANEL ═══ */
+#memory-toggle {
+  position: fixed;
+  right: 16px;
+  bottom: 80px;
+  z-index: 200;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--cyan);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px var(--cyan-dim);
+  transition: var(--transition);
 }
-.info-card strong { color: var(--primary); }
-.info-card code {
-  font-family: monospace; background: var(--bg); padding: 2px 6px;
-  border-radius: 4px; font-size: 12px;
+#memory-toggle:hover {
+  box-shadow: 0 0 25px var(--cyan-glow);
+  border-color: var(--cyan);
 }
-.form-group { margin-bottom: 16px; }
-.form-group label {
-  display: block; margin-bottom: 7px; font-weight: 500; font-size: 14px;
-  color: var(--text-muted);
-}
-.form-group input, .form-group textarea {
-  width: 100%; padding: 11px 13px; border-radius: var(--radius-sm);
-  font-family: var(--font);
-}
-.form-row { display: flex; gap: 12px; }
-.form-row .form-group { flex: 1; }
-.btn-row { display: flex; gap: 10px; margin-top: 22px; justify-content: flex-end; }
+
 #memory-panel {
-  position: fixed; right: 20px; bottom: 100px; width: 300px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 14px; z-index: 90;
-  box-shadow: var(--shadow-lg); transform: translateX(calc(100% + 25px));
-  transition: transform 0.25s ease;
+  position: fixed;
+  right: 16px;
+  bottom: 130px;
+  width: 300px;
+  background: rgba(9,21,37,0.97);
+  border: var(--hud-border);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  z-index: 199;
+  box-shadow: 0 0 40px rgba(0,0,0,0.6), 0 0 20px var(--cyan-dim);
+  transform: translateX(calc(100% + 20px));
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+  backdrop-filter: blur(20px);
 }
 #memory-panel.active { transform: translateX(0); }
-#memory-toggle {
-  position: fixed; right: 20px; bottom: 80px; z-index: 91;
-  width: 42px; height: 42px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  border: none; color: white; font-size: 17px;
-  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
 .memory-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 11px; padding-bottom: 11px; border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: var(--border);
 }
-.memory-header h3 { font-size: 14px; font-weight: 600; }
-.memory-list { max-height: 180px; overflow-y: auto; font-size: 13px; }
+.memory-header h3 {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--cyan);
+}
+.memory-list { max-height: 200px; overflow-y: auto; font-size: 12px; }
 .memory-item {
-  padding: 7px 0; border-bottom: 1px dashed var(--border);
-  display: flex; justify-content: space-between; align-items: flex-start; gap: 7px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--grid);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
 }
 .memory-item:last-child { border-bottom: none; }
-.memory-item .content { flex: 1; color: var(--text-muted); }
+.memory-item .content { flex: 1; color: var(--text); font-family: var(--font-mono); font-size: 11px; line-height: 1.4; }
 .memory-item .actions button {
-  padding: 3px 7px; font-size: 11px; border-radius: 4px; background: var(--bg);
+  padding: 2px 6px;
+  font-size: 10px;
+  background: transparent;
+  border: 1px solid var(--wire);
+  color: var(--danger);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-mono);
 }
+.memory-item .actions button:hover { border-color: var(--danger); background: rgba(255,51,102,0.1); }
 .memory-input {
-  display: flex; gap: 7px; margin-top: 11px; padding-top: 11px;
-  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 7px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: var(--border);
 }
-.memory-input input { flex: 1; padding: 7px 11px; font-size: 13px; }
-.memory-input button { padding: 7px 13px; font-size: 13px; }
-.agent-card {
-  background: var(--bg); padding: 13px; border-radius: var(--radius-sm);
-  margin-bottom: 10px; border: 1px solid var(--border);
-  transition: var(--transition); cursor: pointer;
+.memory-input input {
+  flex: 1;
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 7px 10px;
+  border-radius: var(--r);
+  outline: none;
 }
-.agent-card:hover { border-color: var(--primary); transform: translateX(3px); }
-.agent-card.active { border-color: var(--accent); background: rgba(139, 92, 246, 0.07); }
-.agent-card-header {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
+.memory-input input:focus { border-color: var(--cyan); }
+.memory-input button {
+  background: rgba(0,229,255,0.1);
+  border: var(--border-cyan);
+  color: var(--cyan);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 7px 12px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: var(--transition);
 }
-.agent-card-name { font-weight: 600; font-size: 14px; }
-.agent-card-price {
-  font-family: monospace; font-size: 12px; color: var(--success);
-  background: rgba(16, 185, 129, 0.12); padding: 2px 7px; border-radius: 4px;
+.memory-input button:hover { background: rgba(0,229,255,0.2); }
+
+/* ═══ MODALS ═══ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2,5,9,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+  backdrop-filter: blur(8px);
 }
-.agent-card-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
-.agent-card-tags { display: flex; flex-wrap: wrap; gap: 3px; }
-.agent-card-tags span {
-  font-size: 10px; padding: 2px 5px; background: var(--surface);
-  border-radius: 4px; color: var(--text-muted);
+.modal-overlay.active {
+  display: flex;
+  animation: overlayIn 0.2s ease;
 }
-#model-select { max-width: 260px; font-size: 13px; }
-.model-hint { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-box {
+  background: var(--deep);
+  border: var(--hud-border);
+  border-radius: var(--r-lg);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  box-shadow: 0 0 60px rgba(0,0,0,0.8), 0 0 30px var(--cyan-dim);
+  animation: modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  position: relative;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  background: var(--deep);
+  z-index: 10;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.modal-close {
+  background: transparent;
+  border: 1px solid var(--wire);
+  color: var(--text-dim);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: var(--transition);
+  font-family: var(--font-mono);
+}
+.modal-close:hover { border-color: var(--danger); color: var(--danger); }
+
+.modal-body { padding: 20px 24px 24px; }
+
+/* ═══ FORM ELEMENTS ═══ */
+.field-group { margin-bottom: 18px; }
+.field-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+.field-input, .field-textarea, .field-select {
+  width: 100%;
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--text-bright);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 11px 14px;
+  border-radius: var(--r);
+  outline: none;
+  transition: var(--transition);
+  appearance: none;
+}
+.field-input:focus, .field-textarea:focus, .field-select:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 15px var(--cyan-dim);
+}
+.field-input::placeholder, .field-textarea::placeholder { color: var(--text-dim); }
+.field-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+.field-hint {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 5px;
+  letter-spacing: 0.5px;
+}
+
+.info-block {
+  background: var(--hull);
+  border: var(--border);
+  border-left: 2px solid var(--cyan);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.info-block strong { color: var(--cyan); }
+.info-block code {
+  font-family: var(--font-mono);
+  background: var(--void);
+  border: 1px solid var(--grid);
+  color: var(--text-code);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+.success-block {
+  background: var(--neon-dim);
+  border: 1px solid rgba(0,255,157,0.3);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text);
+  margin-top: 12px;
+}
+.success-block strong { color: var(--neon); }
+
+.step-list {
+  padding: 0;
+  list-style: none;
+  counter-reset: steps;
+}
+.step-list li {
+  counter-increment: steps;
+  position: relative;
+  padding: 10px 10px 10px 40px;
+  font-size: 13px;
+  line-height: 1.6;
+  border-bottom: 1px solid var(--grid);
+}
+.step-list li:last-child { border-bottom: none; }
+.step-list li::before {
+  content: counter(steps);
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 24px;
+  height: 24px;
+  background: rgba(0,229,255,0.1);
+  border: 1px solid rgba(0,229,255,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--cyan);
+  line-height: 24px;
+  text-align: center;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  padding: 14px 0 10px;
+  border-top: 1px dashed var(--grid);
+  margin-top: 14px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: var(--border);
+}
+.btn-primary {
+  background: linear-gradient(135deg, rgba(0,229,255,0.2), rgba(0,255,157,0.1));
+  border: var(--border-cyan);
+  color: var(--cyan);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, rgba(0,229,255,0.3), rgba(0,255,157,0.2));
+  box-shadow: 0 0 20px var(--cyan-glow);
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--wire);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 10px 16px;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 1px;
+}
+.btn-ghost:hover { border-color: var(--text-dim); color: var(--text); }
+
+.badge-neon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: var(--neon-dim);
+  border: 1px solid rgba(0,255,157,0.3);
+  color: var(--neon);
+  letter-spacing: 1px;
+}
+.badge-plasma {
+  background: var(--plasma-dim);
+  border-color: rgba(255,107,53,0.3);
+  color: var(--plasma);
+}
+.badge-violet {
+  background: var(--violet-dim);
+  border-color: rgba(124,58,237,0.4);
+  color: #a78bfa;
+}
+
+/* ═══ TOAST ═══ */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .toast {
-  position: fixed; bottom: 22px; right: 22px; background: var(--bg);
-  color: var(--text); padding: 13px 18px; border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-lg); border: 1px solid var(--border);
-  z-index: 2000; animation: toastIn 0.25s ease; display: flex; align-items: center; gap: 9px;
-  max-width: 340px; font-size: 14px;
+  background: var(--deep);
+  border: var(--hud-border);
+  color: var(--text);
+  padding: 11px 16px;
+  border-radius: var(--r);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  max-width: 340px;
 }
-@keyframes toastIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-.toast.success { border-left: 3px solid var(--success); }
-.toast.error { border-left: 3px solid var(--danger); }
-.toast.info { border-left: 3px solid var(--primary); }
-.hidden { display: none !important; }
-.loading {
-  display: inline-block; width: 11px; height: 11px; border: 2px solid rgba(255,255,255,0.35);
-  border-radius: 50%; border-top-color: white; animation: spin 0.7s linear infinite; margin-right: 5px;
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(30px) scale(0.9); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+.toast.success { border-left: 2px solid var(--neon); }
+.toast.error { border-left: 2px solid var(--danger); }
+.toast.info { border-left: 2px solid var(--cyan); }
+
+/* ═══ CORNER DECORATIONS ═══ */
+.corner-deco {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: rgba(0,229,255,0.4);
+  border-style: solid;
+}
+.corner-tl { top: 0; left: 0; border-width: 1px 0 0 1px; }
+.corner-tr { top: 0; right: 0; border-width: 1px 1px 0 0; }
+.corner-bl { bottom: 0; left: 0; border-width: 0 0 1px 1px; }
+.corner-br { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+
+/* ═══ DATA / EXPORT SECTION ═══ */
+.data-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 12px 0;
+}
+.data-card {
+  background: var(--hull);
+  border: var(--border);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  text-align: center;
+}
+.data-card-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--cyan);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.data-card-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.export-zone {
+  border: 2px dashed var(--wire);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+  margin: 12px 0;
+}
+.export-zone:hover, .export-zone.dragover {
+  border-color: rgba(0,229,255,0.5);
+  background: rgba(0,229,255,0.03);
+  box-shadow: 0 0 20px var(--cyan-dim);
+}
+.export-zone-icon { font-size: 28px; margin-bottom: 8px; }
+.export-zone-text {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+.export-zone-text strong { color: var(--text); display: block; margin-bottom: 4px; font-size: 13px; }
+
+/* ═══ AGENT CARDS IN MODAL ═══ */
+.agent-preview {
+  background: var(--hull);
+  border: var(--border);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.agent-preview:hover { border-color: rgba(0,229,255,0.4); background: var(--plate); }
+.agent-preview-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 3px;
+}
+.agent-preview-desc { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+
+/* ═══ LOADING SPINNER ═══ */
+.spin-ring {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(0,229,255,0.2);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══ WELCOME MESSAGE HEADER AREA ═══ */
+.welcome-banner {
+  align-self: center;
+  text-align: center;
+  padding: 28px 20px;
+  max-width: 500px;
+}
+.welcome-banner .wv-logo {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: var(--text-bright);
+  text-shadow: 0 0 30px rgba(0,229,255,0.4);
+  margin-bottom: 8px;
+}
+.welcome-banner .wv-sub {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 4px;
+  color: var(--cyan);
+  opacity: 0.7;
+  margin-bottom: 20px;
+}
+.welcome-banner p {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+/* ═══ BURGER MENU ═══ */
+#burger-btn {
+  display: none;
+  background: var(--hull);
+  border: var(--hud-border);
+  color: var(--cyan);
+  font-size: 18px;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+#burger-btn:hover { border-color: var(--cyan); box-shadow: 0 0 10px var(--cyan-dim); }
+
+#mobile-menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background: rgba(5,13,24,0.98);
+  border-bottom: var(--hud-border);
+  backdrop-filter: blur(20px);
+  z-index: 99;
+  padding: 14px 16px;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  animation: menuSlideDown 0.2s ease;
+}
+@keyframes menuSlideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+#mobile-menu.open { display: flex; }
+
+.mobile-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.mobile-row .hud-select,
+.mobile-row .hud-btn {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  padding: 9px 10px;
+  text-align: center;
+}
+.mobile-row .status-pill { flex-shrink: 0; }
+
+/* ═══ RESPONSIVE ═══ */
 @media (max-width: 768px) {
-  header { padding: 11px 14px; }
-  #chat-container { padding: 14px; }
+  #voanh-header { padding: 0 12px; gap: 10px; }
+  .brand-name { font-size: 15px; letter-spacing: 3px; }
+  .brand-sub { display: none; }
+  .header-controls { display: none; }
+  .header-right { display: none; }
+  #burger-btn { display: flex; }
+  #chat-container { padding: 14px 12px; }
   .message { max-width: 95%; }
-  #memory-panel { width: calc(100% - 36px); right: 18px; bottom: 88px; }
-  #model-select { max-width: 100%; }
-  .controls { width: 100%; justify-content: space-between; }
+  #memory-panel { width: calc(100% - 32px); right: 16px; bottom: 110px; }
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal-box { max-height: 92dvh; border-radius: var(--r-lg) var(--r-lg) 0 0; max-width: 100%; }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .data-grid { grid-template-columns: 1fr 1fr; }
+  #input-area { padding: 10px 12px; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  #model-select { max-width: 140px; }
+  #agent-select { max-width: 130px; }
+}
+
+/* ═══ THEME SWITCHER ═══ */
+[data-theme="light"] {
+  --void: #f0f4f8;
+  --deep: #e8edf5;
+  --hull: #ffffff;
+  --plate: #f5f8fc;
+  --grid: #dde5ef;
+  --wire: #c8d5e5;
+  --text: #2d4a6b;
+  --text-bright: #0d1f35;
+  --text-dim: #7a9ab8;
+  --text-code: #0070a8;
+  --cyan: #0070a8;
+  --cyan-dim: rgba(0,112,168,0.1);
+  --cyan-glow: rgba(0,112,168,0.25);
+  --neon: #00875a;
+  --neon-dim: rgba(0,135,90,0.1);
+  --void: #f2f6fb;
+}
+[data-theme="light"] body {
+  background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0,112,168,0.05) 0%, transparent 60%);
+}
+[data-theme="light"] body::before { display: none; }
+
+[data-theme="midnight"] {
+  --void: #09090f;
+  --deep: #0d0d18;
+  --hull: #131320;
+  --plate: #181828;
+  --grid: #1e1e32;
+  --wire: #252540;
+  --cyan: #9b8fff;
+  --cyan-dim: rgba(155,143,255,0.12);
+  --cyan-glow: rgba(155,143,255,0.3);
+  --neon: #ff8aff;
+  --neon-dim: rgba(255,138,255,0.1);
 }
 </style>
 </head>
 <body>
 
-<header>
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header id="voanh-header">
   <div class="brand">
-    <div class="brand-icon">✦</div>
-    <span>NEXUS</span>
+    <div class="brand-logo">
+      <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="18,2 34,12 34,24 18,34 2,24 2,12" stroke="#00e5ff" stroke-width="1.5" fill="none" opacity="0.6"/>
+        <polygon points="18,7 29,13 29,23 18,29 7,23 7,13" stroke="#00e5ff" stroke-width="1" fill="none" opacity="0.3"/>
+        <circle cx="18" cy="18" r="4" fill="#00e5ff" opacity="0.9"/>
+        <line x1="18" y1="2" x2="18" y2="7" stroke="#00e5ff" stroke-width="1"/>
+        <line x1="18" y1="29" x2="18" y2="34" stroke="#00e5ff" stroke-width="1"/>
+        <line x1="2" y1="12" x2="7" y2="13" stroke="#00e5ff" stroke-width="1"/>
+        <line x1="34" y1="12" x2="29" y2="13" stroke="#00e5ff" stroke-width="1"/>
+      </svg>
+    </div>
+    <div>
+      <div class="brand-name">VOANH</div>
+      <div class="brand-sub">MISTRAL AI INTERFACE</div>
+    </div>
   </div>
-  <div class="controls">
-    <span class="status-badge" id="api-status">🔑 API: Inactive</span>
-    <select id="model-select"></select>
-    <select id="agent-select"><option value="">🤖 Select Agent</option></select>
-    <button id="clear-chat" class="ghost">🗑️ Clear</button>
-    <button id="new-chat" class="ghost">➕ New</button>
-  </div>
-  <div class="controls">
-    <select id="theme-select">
-      <option value="light">☀️ Light</option>
-      <option value="dark">🌙 Dark</option>
-      <option value="sand">🏖️ Sand</option>
+
+  <div class="header-controls">
+    <select class="hud-select" id="model-select"></select>
+    <select class="hud-select" id="agent-select">
+      <option value="">▸ NO AGENT</option>
     </select>
-    <button id="open-api-modal" class="primary">🔓 Get Free API</button>
-    <button id="open-agent-modal">⚙️ Create Agent</button>
+    <button class="hud-btn" id="clear-chat">⌫ CLEAR</button>
+    <button class="hud-btn" id="new-chat">+ NEW</button>
   </div>
+
+  <div class="header-right">
+    <span class="status-pill" id="api-status"><span class="status-dot"></span>OFFLINE</span>
+    <select class="hud-select" id="theme-select">
+      <option value="cyber">◈ CYBER</option>
+      <option value="midnight">◈ MIDNIGHT</option>
+      <option value="light">◈ LIGHT</option>
+    </select>
+    <button class="hud-btn primary" id="open-api-modal">⬡ API KEY</button>
+    <button class="hud-btn" id="open-agent-modal">⚙ AGENT</button>
+    <button class="hud-btn" id="open-data-modal">⬡ DATA</button>
+  </div>
+  <!-- BURGER (mobile only) -->
+  <button id="burger-btn" title="Menu">☰</button>
 </header>
 
-<main id="chat-container">
-  <div class="message assistant">
-    <div class="message-content">Welcome to NEXUS. I am your Mistral AI interface with global memory, agent intelligence, and multi-model support. How can I assist you today?</div>
-    <div class="meta"><span>System</span><span class="memory-tag">🧠 Memory Active</span></div>
+<!-- ═══════════════════ MOBILE MENU ═══════════════════ -->
+<div id="mobile-menu">
+  <!-- Row 1 : Statut + Thème -->
+  <div class="mobile-row">
+    <span class="status-pill" id="api-status-mob"><span class="status-dot"></span>OFFLINE</span>
+    <select class="hud-select" id="theme-select-mob" style="flex:1">
+      <option value="cyber">◈ CYBER</option>
+      <option value="midnight">◈ MIDNIGHT</option>
+      <option value="light">◈ LIGHT</option>
+    </select>
   </div>
-</main>
-
-<div id="input-area">
-  <textarea id="user-input" placeholder="Type your message... (Enter to send, Shift+Enter for new line)"></textarea>
-  <button id="send-btn" class="primary">Send ➤</button>
+  <!-- Row 2 : Modèle + Agent -->
+  <div class="mobile-row">
+    <select class="hud-select" id="model-select-mob" style="flex:1"></select>
+    <select class="hud-select" id="agent-select-mob" style="flex:1">
+      <option value="">▸ NO AGENT</option>
+    </select>
+  </div>
+  <!-- Row 3 : Actions -->
+  <div class="mobile-row">
+    <button class="hud-btn primary" id="open-api-modal-mob" style="flex:1">⬡ API KEY</button>
+    <button class="hud-btn" id="open-agent-modal-mob" style="flex:1">⚙ AGENT</button>
+    <button class="hud-btn" id="open-data-modal-mob" style="flex:1">⬡ DATA</button>
+  </div>
+  <!-- Row 4 : Chat -->
+  <div class="mobile-row">
+    <button class="hud-btn" id="clear-chat-mob" style="flex:1">⌫ CLEAR</button>
+    <button class="hud-btn" id="new-chat-mob" style="flex:1">+ NEW CHAT</button>
+  </div>
 </div>
 
-<!-- Memory Panel -->
-<button id="memory-toggle">🧠</button>
+<!-- ═══════════════════ CHAT ═══════════════════ -->
+<main id="chat-container"></main>
+
+<!-- ═══════════════════ INPUT ═══════════════════ -->
+<div id="input-area">
+  <textarea id="user-input" placeholder="Transmettez votre message… (Entrée pour envoyer, Maj+Entrée pour nouvelle ligne)" rows="1"></textarea>
+  <button id="send-btn">SEND ▶</button>
+</div>
+
+<!-- ═══════════════════ MEMORY ═══════════════════ -->
+<button id="memory-toggle" title="Mémoire Globale">⬡</button>
 <div id="memory-panel">
   <div class="memory-header">
-    <h3>🧠 Global Memory</h3>
-    <button id="memory-clear" class="ghost" style="padding:3px 7px;font-size:11px">Clear</button>
+    <h3>⬡ MÉMOIRE GLOBALE</h3>
+    <button class="btn-ghost" id="memory-clear" style="padding:3px 8px;font-size:10px;border-radius:3px">EFFACER</button>
   </div>
   <div class="memory-list" id="memory-list"></div>
   <div class="memory-input">
-    <input type="text" id="memory-input" placeholder="Add to global memory...">
-    <button id="memory-add">Add</button>
+    <input type="text" id="memory-input" placeholder="Ajouter à la mémoire…">
+    <button id="memory-add">+</button>
   </div>
 </div>
 
-<!-- API Modal -->
-<div class="modal" id="api-modal">
- <div class="modal-content">
-  <h2>🚀 Activer Mistral AI — 100% Gratuit</h2>
-  
-  <!-- Formulaire en premier -->
-  <div class="form-group" style="margin-bottom:22px">
-    <label>🔑 Votre clé API Mistral</label>
-    <input type="password" id="api-key-input" placeholder="Collez votre clé ici (ex: sk-...)">
-    <div class="model-hint">Format : commence par <code>sk-</code> ou <code>mistral-</code>, min. 20 caractères</div>
-  </div>
-  <div class="btn-row" style="margin-bottom:24px">
-    <button id="save-api-key" class="primary">💾 Enregistrer & Activer</button>
-    <button id="close-api-modal" class="ghost">Annuler</button>
-  </div>
-  
-  <!-- Tutoriel en français ensuite -->
-  <div class="info-card">
-    <h3 style="margin-bottom:12px;color:var(--primary)">🎁 Comment obtenir votre clé gratuite en 2 minutes</h3>
-    
-    <p><strong>✨ La bonne nouvelle ?</strong> Mistral offre <strong>1 milliard de tokens par mois</strong> gratuitement. C'est l'équivalent de <strong>plus de 5 000 €</strong> de puissance IA — chaque mois, sans payer un centime.</p>
-    
-    <div style="background:var(--bg);padding:12px;border-radius:8px;margin:12px 0">
-      <p style="font-weight:600;margin-bottom:8px">📊 Pour comprendre la valeur :</p>
-      <ul style="padding-left:18px;font-size:13px;line-height:1.7">
-        <li>Chez OpenAI ou Anthropic : ~1,50 € pour 1 million de tokens</li>
-        <li>Avec Mistral Free Tier : <strong>1 000 millions de tokens = 0 €</strong></li>
-        <li>Soit <strong>~1 500 € économisés chaque mois</strong> pour vos projets !</li>
-      </ul>
+<!-- ═══════════════════ MODAL : API KEY ═══════════════════ -->
+<div class="modal-overlay" id="api-modal">
+  <div class="modal-box">
+    <div class="corner-deco corner-tl"></div>
+    <div class="corner-deco corner-tr"></div>
+    <div class="corner-deco corner-bl"></div>
+    <div class="corner-deco corner-br"></div>
+    <div class="modal-header">
+      <div class="modal-title">⬡ ACTIVATION API MISTRAL</div>
+      <button class="modal-close" id="close-api-modal">✕</button>
     </div>
-    
-    <p style="font-weight:600;margin:14px 0 8px">🗝️ Obtenir votre clé en 4 étapes simples :</p>
-    <ol style="padding-left:18px;font-size:14px;line-height:1.8">
-      <li>Rendez-vous sur <strong><code>console.mistral.ai</code></strong></li>
-      <li>Cliquez sur <strong>"Sign Up"</strong> → créez votre compte (email + mot de passe)</li>
-      <li>Dans le menu, allez dans <strong>"API Keys"</strong> → cliquez sur <strong>"Create Key"</strong></li>
-      <li>Copiez la clé générée (elle commence par <code>sk-</code>) et collez-la ci-dessus ✨</li>
-    </ol>
-    
-    <div style="background:rgba(16,185,129,0.1);border-left:3px solid var(--success);padding:10px 12px;border-radius:6px;margin-top:14px">
-      <p style="font-size:13px;margin:0">
-        <strong>💡 Astuce pro :</strong> Votre clé est stockée uniquement dans votre navigateur (cookie sécurisé). 
-        Elle n'est jamais envoyée à nos serveurs. Vous gardez le contrôle total.
-      </p>
-    </div>
-    
-    <p style="margin-top:14px;font-size:13px;color:var(--text-muted)">
-      🔄 Besoin d'aide ? Consultez la <a href="https://docs.mistral.ai" target="_blank" style="color:var(--primary)">documentation officielle Mistral</a>.
-    </p>
-  </div>
-</div>
-    <div class="btn-row">
-      <button id="save-api-key" class="primary">💾 Save & Activate</button>
-      <button id="close-api-modal" class="ghost">Cancel</button>
+    <div class="modal-body">
+
+      <!-- FORMULAIRE -->
+      <div class="field-group">
+        <label class="field-label">🔑 Clé API Mistral</label>
+        <input type="password" class="field-input" id="api-key-input" placeholder="Collez votre clé ici…">
+        <div class="field-hint">Format : min. 20 caractères — ex. <code style="font-family:var(--font-mono);color:var(--text-code);font-size:11px">sk-xxxxxxxxxxxxxxxxxxxxxxxx</code></div>
+      </div>
+      <div class="btn-row" style="margin-top:0;padding-top:0;border-top:none;margin-bottom:20px">
+        <button class="btn-ghost" id="close-api-modal-2">Annuler</button>
+        <button class="btn-primary" id="save-api-key">💾 ENREGISTRER ET ACTIVER</button>
+      </div>
+
+      <!-- SÉPARATEUR -->
+      <div class="section-title">GUIDE D'ACTIVATION — ACCÈS GRATUIT</div>
+
+      <!-- INFO TUTORIEL -->
+      <div class="info-block" style="margin-top:12px">
+        <strong>✦ Free Tier Mistral AI — Chiffres Officiels 2025</strong><br>
+        Le Free Tier de Mistral AI donne accès aux modèles via l'API sans abonnement payant. Les limites exactes dépendent du modèle utilisé, mais typiquement :
+        <ul style="padding-left:16px;margin-top:8px;line-height:2">
+          <li>Modèles légers (Ministral, Mistral Small) : <strong>~1 req/sec</strong>, plusieurs dizaines de milliers de tokens/min</li>
+          <li>Modèles large (Mistral Large, Codestral) : <strong>~500 req/heure</strong>, limites adaptées</li>
+          <li>Aucun frais de carte bancaire pour commencer</li>
+        </ul>
+        <div style="margin-top:8px;font-size:12px;color:var(--text-dim)">▸ Consultez <code>console.mistral.ai</code> → votre tableau de bord pour voir vos quotas en temps réel.</div>
+      </div>
+
+      <!-- ÉTAPES -->
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--cyan);margin:14px 0 10px;opacity:0.7">PROCÉDURE EN 4 ÉTAPES</div>
+      <ol class="step-list">
+        <li>Ouvrez <strong><code>console.mistral.ai</code></strong> dans votre navigateur</li>
+        <li>Cliquez sur <strong>"Sign Up"</strong> → créez votre compte (email + mot de passe, ou OAuth Google)</li>
+        <li>Dans le menu latéral, allez dans <strong>"API Keys"</strong> → cliquez <strong>"Create new key"</strong> → nommez-la (ex. <em>voanh-key</em>)</li>
+        <li>Copiez la clé générée (visible <strong>une seule fois</strong>) → collez-la dans le champ ci-dessus</li>
+      </ol>
+
+      <div class="success-block">
+        <strong>🔒 Sécurité locale garantie</strong><br>
+        Votre clé API est stockée dans un cookie sécurisé de votre navigateur. Elle n'est jamais transmise à aucun serveur tiers — uniquement envoyée directement à <code style="font-size:11px;color:var(--neon)">api.mistral.ai</code>.
+      </div>
+
+      <div style="margin-top:12px;font-size:12px;color:var(--text-dim);text-align:center">
+        Documentation officielle : <a href="https://docs.mistral.ai" target="_blank" style="color:var(--cyan)">docs.mistral.ai</a>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Agent Modal -->
-<div class="modal" id="agent-modal">
-  <div class="modal-content">
-    <h2>⚙️ Create Intelligent Agent</h2>
-    <div class="form-group">
-      <label>Agent Name</label>
-      <input type="text" id="agent-name" placeholder="e.g., CodeArchitect, ResearchBot">
+<!-- ═══════════════════ MODAL : AGENT ═══════════════════ -->
+<div class="modal-overlay" id="agent-modal">
+  <div class="modal-box">
+    <div class="corner-deco corner-tl"></div>
+    <div class="corner-deco corner-tr"></div>
+    <div class="corner-deco corner-bl"></div>
+    <div class="corner-deco corner-br"></div>
+    <div class="modal-header">
+      <div class="modal-title">⚙ CRÉER UN AGENT IA</div>
+      <button class="modal-close" id="close-agent-modal">✕</button>
     </div>
-    <div class="form-group">
-      <label>Role & Expertise</label>
-      <textarea id="agent-desc" rows="2" placeholder="Describe the agent's specialty, tone, and capabilities..."></textarea>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>Price (€) — Optional</label>
-        <input type="number" id="agent-price" placeholder="0" min="0" step="0.01">
+    <div class="modal-body">
+
+      <!-- EXPLICATION DU CERVEAU CENTRAL -->
+      <div class="info-block" style="border-left-color:var(--neon)">
+        <strong style="color:var(--neon)">▸ Qu'est-ce qu'un Agent VOANH ?</strong><br>
+        Un Agent est un <em>cerveau central</em> qui dirige chaque conversation. Il définit la <strong>personnalité</strong>, le <strong>domaine d'expertise</strong>, le <strong>ton</strong> et les <strong>règles comportementales</strong> du modèle IA. Une fois activé, chaque réponse est façonnée par ses instructions. Vous pouvez créer plusieurs agents spécialisés (dev, rédaction, analyse, recherche…) et switcher selon la tâche.
       </div>
-      <div class="form-group">
-        <label>Memory Tags (comma-separated)</label>
-        <input type="text" id="agent-tags" placeholder="coding,research,creative">
+
+      <!-- ONGLETS AGENTS EXISTANTS -->
+      <div id="agent-existing-list"></div>
+
+      <div class="section-title">CONFIGURATION DU NOUVEL AGENT</div>
+
+      <div class="field-group">
+        <label class="field-label">Nom de l'Agent <span style="color:var(--danger)">*</span></label>
+        <input type="text" class="field-input" id="agent-name" placeholder="ex. CodeArchitect, ResearchBot, BioinfoGPT…">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Rôle & Domaine d'Expertise <span style="color:var(--danger)">*</span></label>
+        <textarea class="field-textarea" id="agent-desc" rows="2" placeholder="Ex : Tu es un expert en bioinformatique spécialisé en génomique. Tu analyses les données scientifiques avec précision et cites tes sources."></textarea>
+        <div class="field-hint">▸ Décrivez la spécialité, le ton souhaité et les capacités principales de cet agent.</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field-group">
+          <label class="field-label">Tags Mémoire</label>
+          <input type="text" class="field-input" id="agent-tags" placeholder="code, recherche, médecine">
+          <div class="field-hint">Séparés par des virgules</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Modèle préféré</label>
+          <select class="field-input field-select" id="agent-model-pref">
+            <option value="">Auto (par défaut)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Instructions Comportementales Avancées</label>
+        <textarea class="field-textarea" id="agent-instructions" rows="4" placeholder="Ex :&#10;- Réponds toujours en français sauf si l'utilisateur écrit en anglais&#10;- Structure tes réponses avec des sections claires&#10;- Cite systématiquement les sources et les APIs utilisées&#10;- Si la question dépasse ton domaine, dis-le clairement"></textarea>
+        <div class="field-hint">▸ Ces règles sont injectées dans chaque prompt système. Soyez précis pour un comportement optimal du cerveau central.</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Phrase d'Amorce (Contexte Initial)</label>
+        <textarea class="field-textarea" id="agent-primer" rows="2" placeholder="Ex : 'Je commence chaque analyse par une revue des publications récentes sur PubMed…'"></textarea>
+        <div class="field-hint">▸ Contexte de départ injecté au début de la conversation.</div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-ghost" id="close-agent-modal-2">Annuler</button>
+        <button class="btn-primary" id="save-agent">⚙ CRÉER L'AGENT</button>
       </div>
     </div>
-    <div class="form-group">
-      <label>Custom Instructions</label>
-      <textarea id="agent-instructions" rows="3" placeholder="Additional behavioral rules for this agent..."></textarea>
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL : DATA ═══════════════════ -->
+<div class="modal-overlay" id="data-modal">
+  <div class="modal-box">
+    <div class="corner-deco corner-tl"></div>
+    <div class="corner-deco corner-tr"></div>
+    <div class="corner-deco corner-bl"></div>
+    <div class="corner-deco corner-br"></div>
+    <div class="modal-header">
+      <div class="modal-title">⬡ GESTION DES DONNÉES</div>
+      <button class="modal-close" id="close-data-modal">✕</button>
     </div>
-    <div class="btn-row">
-      <button id="save-agent" class="primary">💾 Create Agent</button>
-      <button id="close-agent-modal" class="ghost">Cancel</button>
+    <div class="modal-body">
+
+      <div class="info-block">
+        <strong>▸ Stockage 100% Local</strong><br>
+        Toutes vos données (conversations, agents, mémoires) sont stockées dans la base IndexedDB de votre navigateur. Exportez-les pour les sauvegarder ou les transférer sur un autre appareil.
+      </div>
+
+      <!-- STATS -->
+      <div class="data-grid" id="data-stats">
+        <div class="data-card"><div class="data-card-value" id="stat-chats">—</div><div class="data-card-label">Conversations</div></div>
+        <div class="data-card"><div class="data-card-value" id="stat-agents">—</div><div class="data-card-label">Agents</div></div>
+        <div class="data-card"><div class="data-card-value" id="stat-memories">—</div><div class="data-card-label">Mémoires</div></div>
+        <div class="data-card"><div class="data-card-value" id="stat-size">—</div><div class="data-card-label">Taille estimée</div></div>
+      </div>
+
+      <!-- EXPORT -->
+      <div class="section-title">EXPORTER VOS DONNÉES</div>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.6">Téléchargez toutes vos données dans un fichier <code style="font-family:var(--font-mono);font-size:10px;color:var(--cyan)">.voanh.json</code> que vous pourrez réimporter à tout moment.</p>
+      <button class="btn-primary" id="btn-export" style="width:100%;justify-content:center;display:flex;gap:8px;align-items:center">
+        ⬇ TÉLÉCHARGER TOUTES LES DONNÉES
+      </button>
+
+      <!-- IMPORT -->
+      <div class="section-title">IMPORTER DES DONNÉES</div>
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:12px;line-height:1.6">Restaurez une sauvegarde précédente. <strong style="color:var(--warning)">Attention :</strong> les données existantes seront fusionnées (non remplacées).</p>
+
+      <!-- Zone sélection fichier -->
+      <div class="export-zone" id="import-drop-zone">
+        <div class="export-zone-icon">⬆</div>
+        <div class="export-zone-text">
+          <strong id="import-zone-label">Glissez votre fichier .voanh.json ici</strong>
+          ou cliquez pour sélectionner
+        </div>
+      </div>
+      <input type="file" id="import-file-input" accept=".json,.voanh.json" style="display:none">
+
+      <!-- Aperçu fichier sélectionné (caché par défaut) -->
+      <div id="import-preview" style="display:none;background:var(--hull);border:var(--hud-border);border-radius:var(--r);padding:14px 16px;margin-top:10px">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--cyan);margin-bottom:8px">FICHIER SÉLECTIONNÉ</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:22px">📄</span>
+          <div>
+            <div id="import-filename" style="font-family:var(--font-mono);font-size:12px;color:var(--text-bright)">—</div>
+            <div id="import-fileinfo" style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">—</div>
+          </div>
+        </div>
+        <div id="import-summary" style="font-size:12px;color:var(--text);line-height:1.7;background:var(--void);border-radius:var(--r);padding:10px 12px;margin-bottom:12px;border:1px solid var(--grid)">
+          Analyse en cours…
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-ghost" id="btn-import-cancel" style="flex:1">✕ Annuler</button>
+          <button class="btn-primary" id="btn-import-confirm" style="flex:2;justify-content:center;display:flex;gap:6px;align-items:center">
+            ✓ VALIDER ET RESTAURER
+          </button>
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="section-title" style="border-top-color:rgba(255,51,102,0.3);color:rgba(255,51,102,0.6)">ZONE CRITIQUE</div>
+      <button class="btn-ghost" id="btn-clear-all" style="width:100%;justify-content:center;display:flex;border-color:rgba(255,51,102,0.3);color:var(--danger)">
+        ⚠ SUPPRIMER TOUTES LES DONNÉES LOCALES
+      </button>
+
+      <div class="btn-row" style="border-top:none;margin-top:12px;padding-top:0">
+        <button class="btn-ghost" id="close-data-modal-2">Fermer</button>
+      </div>
     </div>
   </div>
 </div>
 
 <div id="toast-container"></div>
 
+<!-- ═══════════════════════════════════════════
+  JAVASCRIPT
+═══════════════════════════════════════════ -->
 <script>
-// ==================== CONFIGURATION ====================
-const MODELS = [  { id: "mistral-small-2506", name: "Mistral Flash", desc: "Réponses instantanées, faible latence", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-   { id: "ministral-8b-2512", name: "MicroGenius 8B", desc: "Compact mais puissant, polyvalent", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 }, { id: "codestral-2508", name: "CodeForge Nexus", desc: "Expert en génération et optimisation de code", tokens: 50000, ctx: "4M", price: 1, temp: 0.48 },
-  { id: "devstral-2512", name: "DevMind Ultra", desc: "Assistant développement full-stack intelligent", tokens: 50000, ctx: "4M", price: 1, temp: 0.48 },
-  { id: "devstral-medium-2507", name: "DevPulse Medium", desc: "Équilibre parfait pour le dev quotidien", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "devstral-small-2507", name: "DevSpark Lite", desc: "Rapide et léger pour tâches dev simples", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "labs-mistral-small-creative", name: "CreatiFlow", desc: "Explosion créative pour idées innovantes", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "magistral-medium-2509", name: "MagiCore Balance", desc: "Puissance maîtrisée, réponse équilibrée", tokens: 75000, ctx: "1B", price: 0.08, temp: 0.48 },
-  { id: "magistral-small-2509", name: "MagiSwift", desc: "Intelligence rapide, précision optimale", tokens: 75000, ctx: "1B", price: 0.08, temp: 0.48 },
-  { id: "ministral-14b-2512", name: "MiniTitan 14B", desc: "Performance dense, efficacité énergétique", tokens: 50000, ctx: "4M", price: 0.5, temp: 0.42 },
-  { id: "ministral-3b-2512", name: "NanoMind 3B", desc: "Ultra-rapide, idéal pour micro-tâches", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "mistral-large-2411", name: "Mistral Prime Legacy", desc: "Raisonnement complexe, expertise établie", tokens: 600000, ctx: "200B", price: 1, temp: 0.30 },
-  { id: "mistral-large-2512", name: "Mistral Omega", desc: "Dernière génération, intelligence suprême", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "mistral-medium-2505", name: "Mistral Equinox", desc: "Équilibre parfait vitesse/précision", tokens: 375000, ctx: "-", price: 0.42, temp: 0.48 },
-  { id: "mistral-medium-2508", name: "Mistral Zenith", desc: "Performance medium optimisée", tokens: 375000, ctx: "-", price: 0.42, temp: 0.48 },
-  { id: "mistral-small-2603", name: "Mistral Nova", desc: "Nouvelle ère des modèles compacts", tokens: 375000, ctx: "-", price: 1, temp: 1.44 },
-  { id: "open-mistral-nemo", name: "Nemo OpenCore", desc: "Polyvalent, open-source, fiable", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "pixtral-12b-2409", name: "Pixtral Visionary", desc: "Analyse visuelle + texte, multimodal", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "pixtral-large-2411", name: "Pixtral OmniSight", desc: "Vision premium, compréhension profonde", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "voxtral-mini-2507", name: "Voxtral Echo Mini", desc: "Traitement audio léger et précis", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 },
-  { id: "voxtral-small-2507", name: "Voxtral Sonic", desc: "Audio rapide, transcription intelligente", tokens: 50000, ctx: "4M", price: 1, temp: 0.42 }
+// ════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════
+const MODELS = [
+  { id:"mistral-small-2506",          name:"Mistral Flash",        desc:"Réponses instantanées, faible latence",             tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"ministral-8b-2512",           name:"MicroGenius 8B",       desc:"Compact mais puissant, polyvalent",                 tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"codestral-2508",              name:"CodeForge",            desc:"Expert en génération et optimisation de code",      tokens:50000,  ctx:"4M",   temp:0.48 },
+  { id:"devstral-2512",               name:"DevMind Ultra",        desc:"Assistant développement full-stack",                tokens:50000,  ctx:"4M",   temp:0.48 },
+  { id:"devstral-medium-2507",        name:"DevPulse Medium",      desc:"Équilibre parfait pour le dev quotidien",           tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"devstral-small-2507",         name:"DevSpark Lite",        desc:"Rapide et léger pour tâches dev simples",           tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"labs-mistral-small-creative", name:"CreatiFlow",           desc:"Explosion créative pour idées innovantes",          tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"magistral-medium-2509",       name:"MagiCore",             desc:"Puissance maîtrisée, réponse équilibrée",           tokens:75000,  ctx:"1B",   temp:0.48 },
+  { id:"magistral-small-2509",        name:"MagiSwift",            desc:"Intelligence rapide, précision optimale",           tokens:75000,  ctx:"1B",   temp:0.48 },
+  { id:"ministral-14b-2512",          name:"MiniTitan 14B",        desc:"Performance dense, efficacité maximale",            tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"ministral-3b-2512",           name:"NanoMind 3B",          desc:"Ultra-rapide, idéal pour micro-tâches",             tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"mistral-large-2512",          name:"Mistral Omega",        desc:"Dernière génération, intelligence suprême",         tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"mistral-medium-2505",         name:"Mistral Equinox",      desc:"Équilibre parfait vitesse/précision (375k ctx)",    tokens:375000, ctx:"-",    temp:0.48 },
+  { id:"mistral-medium-2508",         name:"Mistral Zenith",       desc:"Performance medium optimisée (375k ctx)",           tokens:375000, ctx:"-",    temp:0.48 },
+  { id:"mistral-small-2603",          name:"Mistral Nova",         desc:"Contexte très large, analyse approfondie (375k)",   tokens:375000, ctx:"-",    temp:1.44 },
+  { id:"open-mistral-nemo",           name:"Nemo OpenCore",        desc:"Polyvalent, open-source, fiable",                   tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"pixtral-12b-2409",            name:"Pixtral Visionary",    desc:"Analyse visuelle + texte, multimodal",              tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"pixtral-large-2411",          name:"Pixtral OmniSight",    desc:"Vision premium, compréhension profonde",            tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"voxtral-mini-2507",           name:"Voxtral Echo Mini",    desc:"Traitement audio léger et précis",                  tokens:50000,  ctx:"4M",   temp:0.42 },
+  { id:"voxtral-small-2507",          name:"Voxtral Sonic",        desc:"Audio rapide, transcription intelligente",          tokens:50000,  ctx:"4M",   temp:0.42 }
 ];
 
-const DB_NAME = "NEXUS_AI_DB";
-const DB_VERSION = 2;
-let state = { apiKey: null, chatId: null, messages: [], agent: null, model: MODELS[11].id, globalMemories: [] };
+const DB_NAME = "VOANH_AI_DB";
+const DB_VERSION = 3;
 
-// ==================== UTILS ====================
+let state = {
+  apiKey: null,
+  chatId: null,
+  messages: [],
+  agent: null,
+  model: "codestral-2508",
+  globalMemories: []
+};
+
+// ════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const uuid = () => crypto.randomUUID();
 const now = () => Date.now();
 
+const escapeHtml = t => (t||'')
+  .replace(/&/g,"&amp;")
+  .replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;")
+  .replace(/\n/g,"<br>");
+
 const toast = (msg, type = "info") => {
   const t = document.createElement("div");
   t.className = `toast ${type}`;
-  t.innerHTML = `<span>${type === "error" ? "⚠️" : type === "success" ? "✅" : "ℹ️"}</span><span>${msg}</span>`;
+  const icon = type === "error" ? "⚠" : type === "success" ? "✓" : "◈";
+  t.innerHTML = `<span style="color:${type==='error'?'var(--danger)':type==='success'?'var(--neon)':'var(--cyan)'}">${icon}</span><span>${msg}</span>`;
   $("#toast-container").appendChild(t);
-  setTimeout(() => t.remove(), 3500);
+  setTimeout(() => t.remove(), 3800);
 };
 
-const setCookie = (n, v, d = 30) => {
+const setCookie = (n, v, d = 60) => {
   const e = new Date(); e.setDate(e.getDate() + d);
-  document.cookie = `${n}=${encodeURIComponent(v)}; expires=${e.toUTCString()}; path=/; SameSite=Strict`;
+  document.cookie = `${n}=${encodeURIComponent(v)};expires=${e.toUTCString()};path=/;SameSite=Strict`;
 };
 const getCookie = n => {
-  const match = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
-  return match ? decodeURIComponent(match.pop()) : null;
-};
-const escapeHtml = t => t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\n/g,"<br>");
-
-// ==================== API KEY VALIDATION (FIXED) ====================
-const isValidApiKey = (key) => {
-  // Remove all whitespace
-  const k = key.trim();
-  // Must be at least 20 characters (Mistral keys are typically 32-64 chars)
-  if (k.length < 20) return false;
-  // Accept multiple possible prefixes or just alphanumeric patterns
-  const validPatterns = [
-    /^sk-[A-Za-z0-9]{20,}$/,      // OpenAI-style
-    /^mistral-[A-Za-z0-9]{20,}$/, // Mistral-style
-    /^[A-Za-z0-9\-_]{20,}$/        // Generic alphanumeric with dashes/underscores
-  ];
-  return validPatterns.some(pattern => pattern.test(k));
+  const m = document.cookie.match('(^|;)\\s*' + n + '\\s*=\\s*([^;]+)');
+  return m ? decodeURIComponent(m.pop()) : null;
 };
 
-// ==================== INDEXEDDB ====================
+const isValidApiKey = k => {
+  const c = k.trim();
+  if (c.length < 20) return false;
+  return /^[A-Za-z0-9\-_]{20,}$/.test(c);
+};
+
+// ════════════════════════════════════════
+// INDEXEDDB
+// ════════════════════════════════════════
 const db = {
   open: () => new Promise((res, rej) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onupgradeneeded = e => {
       const d = e.target.result;
-      ['chats', 'agents', 'settings', 'global_memory'].forEach(store => {
-        if (!d.objectStoreNames.contains(store)) d.createObjectStore(store, { keyPath: 'id' });
+      ['chats','agents','settings','global_memory'].forEach(s => {
+        if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, { keyPath:'id' });
       });
     };
     req.onsuccess = e => { db.conn = e.target.result; res(db.conn); };
     req.onerror = e => rej(e.target.error);
   }),
   put: (store, data) => new Promise((res, rej) => {
-    const tx = db.conn.transaction(store, 'readwrite');
-    const req = tx.objectStore(store).put(data);
-    req.onsuccess = () => res(); req.onerror = e => rej(e.target.error);
+    try {
+      const tx = db.conn.transaction(store, 'readwrite');
+      const r = tx.objectStore(store).put(data);
+      r.onsuccess = () => res(); r.onerror = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   }),
   get: (store, id) => new Promise((res, rej) => {
-    const tx = db.conn.transaction(store, 'readonly');
-    const req = tx.objectStore(store).get(id);
-    req.onsuccess = () => res(req.result); req.onerror = e => rej(e.target.error);
+    try {
+      const tx = db.conn.transaction(store, 'readonly');
+      const r = tx.objectStore(store).get(id);
+      r.onsuccess = () => res(r.result); r.onerror = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   }),
   getAll: store => new Promise((res, rej) => {
-    const tx = db.conn.transaction(store, 'readonly');
-    const req = tx.objectStore(store).getAll();
-    req.onsuccess = () => res(req.result); req.onerror = e => rej(e.target.error);
+    try {
+      const tx = db.conn.transaction(store, 'readonly');
+      const r = tx.objectStore(store).getAll();
+      r.onsuccess = () => res(r.result); r.onerror = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   }),
   delete: (store, id) => new Promise((res, rej) => {
-    const tx = db.conn.transaction(store, 'readwrite');
-    const req = tx.objectStore(store).delete(id);
-    req.onsuccess = () => res(); req.onerror = e => rej(e.target.error);
+    try {
+      const tx = db.conn.transaction(store, 'readwrite');
+      const r = tx.objectStore(store).delete(id);
+      r.onsuccess = () => res(); r.onerror = e => rej(e.target.error);
+    } catch(e) { rej(e); }
   })
 };
 
-// ==================== MEMORY SYSTEM ====================
+// ════════════════════════════════════════
+// MEMORY SYSTEM
+// ════════════════════════════════════════
 const memory = {
   add: async (content, tags = []) => {
-    const entry = { id: uuid(), content, tags: Array.isArray(tags) ? tags : (tags||"").split(',').map(t => t.trim()).filter(Boolean), created: now(), importance: 1 };
+    const entry = {
+      id: uuid(), content,
+      tags: Array.isArray(tags) ? tags : (tags||"").split(',').map(t=>t.trim()).filter(Boolean),
+      created: now(), importance: 1
+    };
     await db.put('global_memory', entry);
     state.globalMemories.push(entry);
     renderMemoryList();
@@ -496,19 +1546,19 @@ const memory = {
     renderMemoryList();
   },
   clear: async () => {
-    const memories = await db.getAll('global_memory') || [];
-    for (const m of memories) await db.delete('global_memory', m.id);
+    const all = await db.getAll('global_memory') || [];
+    for (const m of all) await db.delete('global_memory', m.id);
     state.globalMemories = [];
     renderMemoryList();
-    toast("Global memory cleared", "success");
+    toast("Mémoire globale effacée", "success");
   },
   getRelevant: (query, limit = 5) => {
     if (!state.globalMemories?.length) return [];
     const q = query.toLowerCase();
     return state.globalMemories
-      .map(m => ({ ...m, score: (m.content.toLowerCase().includes(q) ? 2 : 0) + ((m.tags||[]).some(t => q.includes(t.toLowerCase())) ? 1 : 0) + (m.importance || 1) }))
+      .map(m => ({ ...m, score:(m.content.toLowerCase().includes(q)?2:0) + ((m.tags||[]).some(t=>q.includes(t.toLowerCase()))?1:0) + (m.importance||1) }))
       .filter(m => m.score > 0)
-      .sort((a, b) => b.score - a.score)
+      .sort((a,b) => b.score - a.score)
       .slice(0, limit)
       .map(m => `[MEM:${(m.tags||[]).join(',')}] ${m.content}`);
   }
@@ -517,77 +1567,109 @@ const memory = {
 function renderMemoryList() {
   const list = $("#memory-list");
   if (!state.globalMemories?.length) {
-    list.innerHTML = '<div style="color:var(--text-muted);font-size:13px">No memories yet</div>';
+    list.innerHTML = '<div style="color:var(--text-dim);font-family:var(--font-mono);font-size:11px;padding:8px 0">Aucune mémoire enregistrée</div>';
     return;
   }
-  list.innerHTML = state.globalMemories.slice(-10).reverse().map(m => `
+  list.innerHTML = state.globalMemories.slice(-12).reverse().map(m => `
     <div class="memory-item">
       <div class="content">${escapeHtml(m.content)}</div>
       <div class="actions"><button onclick="memoryDelete('${m.id}')">✕</button></div>
     </div>
   `).join('');
 }
-
-window.memoryDelete = async (id) => {
+window.memoryDelete = async id => {
   await db.delete('global_memory', id);
-  state.globalMemories = (state.globalMemories || []).filter(m => m.id !== id);
+  state.globalMemories = state.globalMemories.filter(m => m.id !== id);
   renderMemoryList();
 };
 
-// ==================== INIT ====================
-document.addEventListener('DOMContentLoaded', async () => {
-  try { await db.open(); } catch(e) { console.error("DB init:", e); }
-  
-  // Theme
-  try {
-    const savedTheme = await db.get('settings', 'theme');
-    if (savedTheme) document.documentElement.dataset.theme = savedTheme.value;
-  } catch(e) {}
-  $("#theme-select").value = document.documentElement.dataset.theme;
-  
-  // Models
-  const modelSel = $("#model-select");
-  MODELS.forEach(m => {
-    const opt = document.createElement("option");
-    opt.value = m.id;
-    opt.textContent = `✦ ${m.name}`;
-    opt.title = `${m.desc} • ${m.ctx} ctx • ${m.tokens.toLocaleString()} tokens`;
-    modelSel.appendChild(opt);
-  });
-  try {
-    const savedModel = await db.get('settings', 'model');
-    if (savedModel) { state.model = savedModel.value; modelSel.value = state.model; }
-  } catch(e) {}
-  
-  // API Key - FIXED VALIDATION
-  const cookieKey = getCookie("mistral_api_key");
-  if (cookieKey && isValidApiKey(cookieKey)) {
-    state.apiKey = cookieKey;
-    $("#api-status").textContent = "🟢 API: Active";
-    $("#api-status").className = "status-badge active";
-    $("#open-api-modal").textContent = "🔄 Change Key";
-  }
-  
-  // Load memories & agents
-  await memory.getAll();
-  await loadAgents();
-  
-  // Start chat
-  try {
-    const savedChatId = await db.get('settings', 'currentChatId');
-    if (savedChatId && savedChatId.value) await loadChat(savedChatId.value);
-    else await newChat();
-  } catch(e) { await newChat(); }
-  
-  bindEvents();
-});
+// ════════════════════════════════════════
+// CHAT RENDERING
+// ════════════════════════════════════════
+function renderMessages() {
+  const c = $("#chat-container");
+  const msgs = (state.messages || []).filter(m => m.role !== 'system');
 
-// ==================== CHAT LOGIC ====================
+  if (!msgs.length) {
+    c.innerHTML = `
+      <div class="welcome-banner">
+        <div class="wv-logo">VOANH</div>
+        <div class="wv-sub">MISTRAL AI INTERFACE v2.0</div>
+        <p>Interface avancée avec mémoire globale, agents spécialisés et accès aux ${MODELS.length} modèles Mistral AI. Configurez votre clé API pour commencer.</p>
+      </div>`;
+    return;
+  }
+
+  c.innerHTML = '';
+  msgs.forEach(m => {
+    const div = document.createElement("div");
+    div.className = `message ${m.role}`;
+    const memTags = m.memoryUsed?.length ? `<span class="mem-tag">⬡ MEM×${m.memoryUsed.length}</span>` : '';
+    const label = m.role === 'user' ? '▸ VOUS' : `▸ ${state.agent ? state.agent.name.toUpperCase() : 'VOANH'}`;
+    div.innerHTML = `
+      <div class="msg-label">${label}</div>
+      <div class="message-content">${escapeHtml(m.content || '')}</div>
+      <div class="msg-meta">
+        <span>${new Date(m.ts).toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'})}</span>
+        ${memTags}
+      </div>`;
+    c.appendChild(div);
+  });
+  c.scrollTop = c.scrollHeight;
+}
+
+function showTyping() {
+  const div = document.createElement("div");
+  div.className = "typing-indicator";
+  div.id = "typing-indicator";
+  div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  $("#chat-container").appendChild(div);
+  $("#chat-container").scrollTop = $("#chat-container").scrollHeight;
+}
+function hideTyping() {
+  const t = $("#typing-indicator");
+  if (t) t.remove();
+}
+
+// ════════════════════════════════════════
+// SYSTEM PROMPT
+// ════════════════════════════════════════
+function buildSystemPrompt() {
+  let prompt = "You are VOANH, a powerful AI assistant interface. Be precise, professional, and helpful.";
+  if (state.agent) {
+    prompt = `[AGENT VOANH : ${state.agent.name}]\n`;
+    prompt += `Rôle : ${state.agent.desc || ''}`;
+    if (state.agent.instructions) prompt += `\nInstructions : ${state.agent.instructions}`;
+    if (state.agent.primer) prompt += `\nContexte initial : ${state.agent.primer}`;
+  }
+  const rel = memory.getRelevant("context", 3);
+  if (rel.length) prompt += `\n\n[MÉMOIRE GLOBALE ACTIVE]\n${rel.join('\n')}`;
+  prompt += "\n\nRéponds dans la langue de l'utilisateur. Sois précis, structuré et professionnel.";
+  return prompt;
+}
+
+// ════════════════════════════════════════
+// SAVE / LOAD CHAT
+// ════════════════════════════════════════
+async function saveChat() {
+  if (!state.chatId) return;
+  try {
+    await db.put('chats', {
+      id: state.chatId,
+      model: state.model,
+      agentId: state.agent?.id,
+      messages: state.messages,
+      title: (state.messages||[]).slice(1).find(m=>m.role==='user')?.content?.slice(0,50) || "Nouvelle conversation",
+      updated: now()
+    });
+  } catch(e) { console.error("saveChat:", e); }
+}
+
 async function newChat() {
   state.chatId = uuid();
-  state.messages = [{ role: "system", content: buildSystemPrompt(), ts: now() }];
+  state.messages = [{ role:"system", content:buildSystemPrompt(), ts:now() }];
   await saveChat();
-  try { await db.put('settings', { key: 'currentChatId', value: state.chatId }); } catch(e) {}
+  try { await db.put('settings', { id:'currentChatId', value:state.chatId }); } catch(e) {}
   renderMessages();
 }
 
@@ -609,177 +1691,614 @@ async function loadChat(id) {
   } catch(e) { console.error("loadChat:", e); }
 }
 
-function buildSystemPrompt() {
-  let prompt = "You are a helpful, concise AI assistant integrated into NEXUS interface.";
-  if (state.agent) {
-    prompt += `\n\n[AGENT: ${state.agent.name}]\nRole: ${state.agent.desc || ''}`;
-    if (state.agent.instructions) prompt += `\nInstructions: ${state.agent.instructions}`;
-    if (state.agent.price > 0) prompt += `\nNote: This agent is valued at €${state.agent.price} for premium tasks.`;
-  }
-  const relevant = memory.getRelevant("context", 3);
-  if (relevant.length) prompt += `\n\n[GLOBAL MEMORY CONTEXT]\n${relevant.join('\n')}`;
-  prompt += "\n\nRespond in the user's language. Be precise, professional, and reference relevant memories when helpful.";
-  return prompt;
-}
-
-function renderMessages() {
-  const c = $("#chat-container");
-  c.innerHTML = "";
-  (state.messages || []).filter(m => m.role !== "system").forEach(m => {
-    const div = document.createElement("div");
-    div.className = `message ${m.role}`;
-    const memTags = m.memoryUsed?.length ? `<span class="memory-tag">🧠 ${m.memoryUsed.length}</span>` : '';
-    div.innerHTML = `<div class="message-content">${escapeHtml(m.content || '')}</div><div class="meta"><span>${new Date(m.ts).toLocaleTimeString()}</span>${memTags}</div>`;
-    c.appendChild(div);
-  });
-  c.scrollTop = c.scrollHeight;
-}
-
-async function saveChat() {
-  if (!state.chatId) return;
-  try {
-    await db.put('chats', {
-      id: state.chatId, model: state.model, agentId: state.agent?.id,
-      messages: state.messages,
-      title: (state.messages || []).slice(1).find(m => m.role === 'user')?.content?.slice(0, 40) || "New Chat",
-      updated: now()
-    });
-  } catch(e) { console.error("saveChat:", e); }
-}
-
+// ════════════════════════════════════════
+// SEND MESSAGE
+// ════════════════════════════════════════
 async function sendMessage() {
   const txt = $("#user-input").value.trim();
   if (!txt) return;
-  if (!state.apiKey) { toast("Please configure your API key first", "error"); $("#api-modal").classList.add("active"); return; }
-  
-  state.messages.push({ role: "user", content: txt, ts: now() });
+  if (!state.apiKey) {
+    toast("Configurez votre clé API d'abord", "error");
+    $("#api-modal").classList.add("active");
+    return;
+  }
+
+  state.messages.push({ role:"user", content:txt, ts:now() });
   renderMessages();
   $("#user-input").value = "";
+  autoResizeTextarea();
   $("#send-btn").disabled = true;
-  $("#send-btn").innerHTML = '<span class="loading"></span>';
+  $("#send-btn").innerHTML = '<span class="spin-ring"></span>';
+  showTyping();
   await saveChat();
-  
+
   const relevantMems = memory.getRelevant(txt, 4);
-  
+
   try {
     const contextMessages = [
-      { role: "system", content: buildSystemPrompt() },
-      ...(state.messages || []).slice(-20).map(m => ({ role: m.role, content: m.content }))
+      { role:"system", content:buildSystemPrompt() },
+      ...(state.messages||[]).slice(-22).map(m => ({ role:m.role, content:m.content }))
     ];
     if (relevantMems.length) {
-      contextMessages.splice(1, 0, { role: "user", content: `[Context from Global Memory]\n${relevantMems.join('\n')}\n\nContinue the conversation:` });
+      contextMessages.splice(1, 0, {
+        role:"user",
+        content:`[Contexte depuis la mémoire globale]\n${relevantMems.join('\n')}\n\nContinuez la conversation :`
+      });
     }
-    const model = MODELS.find(m => m.id === state.model) || MODELS[11];
+    const model = MODELS.find(m => m.id === state.model) || MODELS[2];
     const res = await fetch("https://api.mistral.ai/v1/chat/completions", {
       method: "POST",
-      headers: { "Authorization": `Bearer ${state.apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: state.model, messages: contextMessages, temperature: model.temp, max_tokens: 4096, top_p: 0.95 })
+      headers: {
+        "Authorization": `Bearer ${state.apiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: state.model,
+        messages: contextMessages,
+        temperature: model.temp,
+        max_tokens: 4096,
+        top_p: 0.95
+      })
     });
-    if (!res.ok) { const err = await res.text(); throw new Error(err.slice(0, 200)); }
+
+    if (!res.ok) {
+      const err = await res.text();
+      let errMsg = err.slice(0, 300);
+      try { const j = JSON.parse(err); errMsg = j.message || j.error?.message || errMsg; } catch(e) {}
+      throw new Error(errMsg);
+    }
+
     const data = await res.json();
-    const reply = data.choices?.[0]?.message?.content || "No response";
-    state.messages.push({ role: "assistant", content: reply, ts: now(), memoryUsed: relevantMems.length ? relevantMems : undefined });
+    const reply = data.choices?.[0]?.message?.content || "Aucune réponse";
+    hideTyping();
+    state.messages.push({ role:"assistant", content:reply, ts:now(), memoryUsed:relevantMems.length ? relevantMems : undefined });
     renderMessages();
     await saveChat();
   } catch (e) {
-    toast(`API Error: ${e.message}`, "error");
-    state.messages.push({ role: "assistant", content: `⚠️ Request failed: ${e.message}`, ts: now() });
+    hideTyping();
+    toast(`Erreur API : ${e.message}`, "error");
+    state.messages.push({ role:"assistant", content:`⚠ Requête échouée : ${e.message}`, ts:now() });
     renderMessages();
   } finally {
     $("#send-btn").disabled = false;
-    $("#send-btn").textContent = "Send ➤";
+    $("#send-btn").innerHTML = "SEND ▶";
   }
 }
 
-// ==================== AGENTS ====================
+// ════════════════════════════════════════
+// AGENTS
+// ════════════════════════════════════════
 async function loadAgents() {
   try {
     const agents = await db.getAll('agents') || [];
     const sel = $("#agent-select");
-    sel.innerHTML = '<option value="">🤖 Select Agent</option>';
+    sel.innerHTML = '<option value="">▸ NO AGENT</option>';
     agents.forEach(a => {
       const opt = document.createElement("option");
       opt.value = a.id;
-      const price = a.price > 0 ? ` • €${a.price}` : '';
-      opt.textContent = `✦ ${a.name}${price}`;
+      opt.textContent = `◈ ${a.name}`;
       opt.title = a.desc;
       sel.appendChild(opt);
     });
+    // Existing agents in modal
+    const list = $("#agent-existing-list");
+    if (list) {
+      if (!agents.length) {
+        list.innerHTML = '';
+        return;
+      }
+      list.innerHTML = `
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--text-dim);margin-bottom:10px">AGENTS EXISTANTS (${agents.length})</div>
+        ${agents.map(a => `
+          <div class="agent-preview" onclick="activateAgent('${a.id}')">
+            <div>
+              <div class="agent-preview-name">◈ ${escapeHtml(a.name)}</div>
+              <div class="agent-preview-desc">${escapeHtml((a.desc||'').slice(0,80))}${(a.desc||'').length>80?'…':''}</div>
+            </div>
+            <button onclick="event.stopPropagation();deleteAgent('${a.id}')" style="background:transparent;border:1px solid rgba(255,51,102,0.3);color:var(--danger);font-size:10px;padding:4px 8px;border-radius:3px;cursor:pointer;font-family:var(--font-mono);flex-shrink:0">✕</button>
+          </div>
+        `).join('')}
+      `;
+    }
   } catch(e) { console.error("loadAgents:", e); }
 }
 
-// ==================== EVENTS ====================
+window.activateAgent = async id => {
+  try {
+    const ag = await db.get('agents', id);
+    if (ag) {
+      state.agent = ag;
+      $("#agent-select").value = id;
+      const sys = (state.messages||[]).find(m => m.role === "system");
+      if (sys) { sys.content = buildSystemPrompt(); await saveChat(); renderMessages(); }
+      toast(`Agent "${ag.name}" activé`, "success");
+      $("#agent-modal").classList.remove("active");
+    }
+  } catch(e) { console.error(e); }
+};
+
+window.deleteAgent = async id => {
+  if (!confirm("Supprimer cet agent ?")) return;
+  await db.delete('agents', id);
+  if (state.agent?.id === id) state.agent = null;
+  await loadAgents();
+  toast("Agent supprimé", "success");
+};
+
+// ════════════════════════════════════════
+// DATA EXPORT / IMPORT
+// ════════════════════════════════════════
+async function computeStats() {
+  try {
+    const chats = await db.getAll('chats') || [];
+    const agents = await db.getAll('agents') || [];
+    const mems = await db.getAll('global_memory') || [];
+    const json = JSON.stringify({ chats, agents, mems });
+    const sizeKb = (new Blob([json]).size / 1024).toFixed(1);
+    $("#stat-chats").textContent = chats.length;
+    $("#stat-agents").textContent = agents.length;
+    $("#stat-memories").textContent = mems.length;
+    $("#stat-size").textContent = sizeKb + " KB";
+  } catch(e) {}
+}
+
+async function exportData() {
+  try {
+    const chats = await db.getAll('chats') || [];
+    const agents = await db.getAll('agents') || [];
+    const mems = await db.getAll('global_memory') || [];
+    const settings = await db.getAll('settings') || [];
+    const payload = {
+      version: "2.0",
+      exported: new Date().toISOString(),
+      source: "VOANH",
+      data: { chats, agents, global_memory: mems, settings }
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type:"application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `voanh-backup-${new Date().toISOString().slice(0,10)}.voanh.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("Données exportées avec succès !", "success");
+  } catch(e) {
+    toast("Erreur export : " + e.message, "error");
+  }
+}
+
+async function importData(file) {
+  try {
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    const data = payload.data || payload;
+    let count = 0;
+    if (data.chats?.length) {
+      for (const c of data.chats) { await db.put('chats', c); count++; }
+    }
+    if (data.agents?.length) {
+      for (const a of data.agents) { await db.put('agents', a); count++; }
+    }
+    if (data.global_memory?.length) {
+      for (const m of data.global_memory) { await db.put('global_memory', m); count++; }
+    }
+    await memory.getAll();
+    await loadAgents();
+    await computeStats();
+    toast(`Import réussi — ${count} éléments restaurés`, "success");
+  } catch(e) {
+    toast("Erreur import : " + e.message, "error");
+  }
+}
+
+// ════════════════════════════════════════
+// TEXTAREA AUTO-RESIZE
+// ════════════════════════════════════════
+function autoResizeTextarea() {
+  const ta = $("#user-input");
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 160) + 'px';
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  // DB
+  try { await db.open(); } catch(e) { console.error("DB init:", e); }
+
+  // Theme
+  try {
+    const t = await db.get('settings', 'theme');
+    if (t) {
+      document.documentElement.dataset.theme = t.value;
+      $("#theme-select").value = t.value;
+    }
+  } catch(e) {}
+
+  // Models
+  const modelSel = $("#model-select");
+  const agentModelPref = $("#agent-model-pref");
+  MODELS.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = `◈ ${m.name}`;
+    opt.title = `${m.desc} • ${m.tokens.toLocaleString()} max tokens`;
+    modelSel.appendChild(opt);
+    if (agentModelPref) {
+      const opt2 = document.createElement("option");
+      opt2.value = m.id;
+      opt2.textContent = m.name;
+      agentModelPref.appendChild(opt2);
+    }
+  });
+  try {
+    const savedModel = await db.get('settings', 'model');
+    if (savedModel) { state.model = savedModel.value; modelSel.value = state.model; }
+    else modelSel.value = state.model;
+  } catch(e) {}
+
+  // API Key
+  const cookieKey = getCookie("mistral_api_key");
+  if (cookieKey && isValidApiKey(cookieKey)) {
+    state.apiKey = cookieKey;
+    $("#api-status").innerHTML = '<span class="status-dot"></span>ONLINE';
+    $("#api-status").className = "status-pill active";
+    $("#open-api-modal").textContent = "⬡ CLÉ API";
+  }
+
+  // Memories & agents
+  await memory.getAll();
+  await loadAgents();
+
+  // Chat
+  try {
+    const savedChatId = await db.get('settings', 'currentChatId');
+    if (savedChatId?.value) await loadChat(savedChatId.value);
+    else await newChat();
+  } catch(e) { await newChat(); }
+
+  bindEvents();
+});
+
+// ════════════════════════════════════════
+// EVENTS
+// ════════════════════════════════════════
 function bindEvents() {
+  // Send
   $("#send-btn").onclick = sendMessage;
-  $("#user-input").onkeydown = e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
-  $("#clear-chat").onclick = async () => { state.messages = (state.messages || []).filter(m => m.role === "system"); renderMessages(); await saveChat(); toast("Chat cleared", "success"); };
+  $("#user-input").oninput = autoResizeTextarea;
+  $("#user-input").onkeydown = e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  };
+
+  // Chat controls
+  $("#clear-chat").onclick = async () => {
+    state.messages = (state.messages||[]).filter(m => m.role === "system");
+    renderMessages();
+    await saveChat();
+    toast("Conversation effacée", "success");
+  };
   $("#new-chat").onclick = newChat;
-  $("#model-select").onchange = e => { state.model = e.target.value; db.put('settings', { key: 'model', value: state.model }).catch(()=>{}); const sys = (state.messages||[]).find(m => m.role === "system"); if (sys) { sys.content = buildSystemPrompt(); saveChat(); } };
+
+  // Model
+  $("#model-select").onchange = e => {
+    state.model = e.target.value;
+    db.put('settings', { id:'model', value:state.model }).catch(()=>{});
+    const sys = (state.messages||[]).find(m => m.role === "system");
+    if (sys) { sys.content = buildSystemPrompt(); saveChat(); }
+  };
+
+  // Agent select
   $("#agent-select").onchange = async e => {
     try {
       state.agent = e.target.value ? await db.get('agents', e.target.value) : null;
       const sys = (state.messages||[]).find(m => m.role === "system");
       if (sys) { sys.content = buildSystemPrompt(); await saveChat(); renderMessages(); }
-    } catch(err) { console.error("agent change:", err); }
+    } catch(err) { console.error(err); }
   };
-  $("#theme-select").onchange = e => { document.documentElement.dataset.theme = e.target.value; db.put('settings', { key: 'theme', value: e.target.value }).catch(()=>{}); };
-  
-  // API Modal - FIXED
+
+  // Theme
+  $("#theme-select").onchange = e => {
+    document.documentElement.dataset.theme = e.target.value;
+    db.put('settings', { id:'theme', value:e.target.value }).catch(()=>{});
+  };
+
+  // API Modal
   $("#open-api-modal").onclick = () => $("#api-modal").classList.add("active");
-  $("#close-api-modal").onclick = () => $("#api-modal").classList.remove("active");
+  const closeApiModal = () => $("#api-modal").classList.remove("active");
+  $("#close-api-modal").onclick = closeApiModal;
+  if ($("#close-api-modal-2")) $("#close-api-modal-2").onclick = closeApiModal;
+  $("#api-modal").onclick = e => { if (e.target === $("#api-modal")) closeApiModal(); };
+
   $("#save-api-key").onclick = () => {
     const k = $("#api-key-input").value.trim();
-    // FIXED: Use flexible validation
     if (!isValidApiKey(k)) {
-      return toast("Invalid key format. Must be 20+ chars, usually starts with 'sk-' or 'mistral-'", "error");
+      toast("Clé invalide — min. 20 caractères alphanumériques", "error");
+      return;
     }
     setCookie("mistral_api_key", k);
     state.apiKey = k;
-    $("#api-status").textContent = "🟢 API: Active";
-    $("#api-status").className = "status-badge active";
-    $("#api-modal").classList.remove("active");
-    toast("API key saved successfully!", "success");
+    $("#api-status").innerHTML = '<span class="status-dot"></span>ONLINE';
+    $("#api-status").className = "status-pill active";
+    closeApiModal();
+    toast("Clé API activée avec succès !", "success");
   };
-  
+
   // Agent Modal
-  $("#open-agent-modal").onclick = () => $("#agent-modal").classList.add("active");
-  $("#close-agent-modal").onclick = () => $("#agent-modal").classList.remove("active");
+  const openAgentModal = async () => {
+    await loadAgents();
+    $("#agent-modal").classList.add("active");
+  };
+  const closeAgentModal = () => $("#agent-modal").classList.remove("active");
+  $("#open-agent-modal").onclick = openAgentModal;
+  $("#close-agent-modal").onclick = closeAgentModal;
+  if ($("#close-agent-modal-2")) $("#close-agent-modal-2").onclick = closeAgentModal;
+  $("#agent-modal").onclick = e => { if (e.target === $("#agent-modal")) closeAgentModal(); };
+
   $("#save-agent").onclick = async () => {
     const name = $("#agent-name").value.trim();
     const desc = $("#agent-desc").value.trim();
-    if (!name || !desc) return toast("Name and description required", "error");
+    if (!name || !desc) { toast("Nom et rôle obligatoires", "error"); return; }
     const agent = {
-      id: uuid(), name, desc,
-      price: parseFloat($("#agent-price").value) || 0,
-      tags: ($("#agent-tags").value || "").split(',').map(t => t.trim()).filter(Boolean),
+      id: uuid(),
+      name,
+      desc,
       instructions: $("#agent-instructions").value.trim(),
+      primer: ($("#agent-primer") ? $("#agent-primer").value.trim() : ""),
+      tags: ($("#agent-tags").value||"").split(',').map(t=>t.trim()).filter(Boolean),
+      modelPref: ($("#agent-model-pref") ? $("#agent-model-pref").value : ""),
       created: now()
     };
     await db.put('agents', agent);
-    $("#agent-modal").classList.remove("active");
+    closeAgentModal();
     await loadAgents();
     $("#agent-select").value = agent.id;
     state.agent = agent;
     const sys = (state.messages||[]).find(m => m.role === "system");
     if (sys) { sys.content = buildSystemPrompt(); await saveChat(); renderMessages(); }
-    toast(`Agent "${name}" created!`, "success");
-    $("#agent-name").value = ""; $("#agent-desc").value = ""; $("#agent-price").value = ""; $("#agent-tags").value = ""; $("#agent-instructions").value = "";
+    toast(`Agent "${name}" créé et activé !`, "success");
+    ["agent-name","agent-desc","agent-instructions","agent-tags"].forEach(id => {
+      const el = $(`#${id}`);
+      if (el) el.value = "";
+    });
+    if ($("#agent-primer")) $("#agent-primer").value = "";
   };
-  
-  // Memory Panel
+
+  // Memory
   $("#memory-toggle").onclick = () => $("#memory-panel").classList.toggle("active");
   $("#memory-add").onclick = async () => {
     const txt = $("#memory-input").value.trim();
     if (!txt) return;
     await memory.add(txt);
     $("#memory-input").value = "";
-    toast("Memory added", "success");
+    toast("Mémoire ajoutée", "success");
     const sys = (state.messages||[]).find(m => m.role === "system");
     if (sys) { sys.content = buildSystemPrompt(); await saveChat(); }
   };
   $("#memory-input").onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); $("#memory-add").click(); } };
-  $("#memory-clear").onclick = async () => { if (confirm("Clear all global memories?")) await memory.clear(); };
+  $("#memory-clear").onclick = async () => {
+    if (confirm("Effacer toute la mémoire globale ?")) await memory.clear();
+  };
+
+  // Data Modal
+  const openDataModal = async () => {
+    await computeStats();
+    $("#data-modal").classList.add("active");
+  };
+  const closeDataModal = () => $("#data-modal").classList.remove("active");
+  if ($("#open-data-modal")) $("#open-data-modal").onclick = openDataModal;
+  if ($("#close-data-modal")) $("#close-data-modal").onclick = closeDataModal;
+  if ($("#close-data-modal-2")) $("#close-data-modal-2").onclick = closeDataModal;
+  if ($("#data-modal")) $("#data-modal").onclick = e => { if (e.target === $("#data-modal")) closeDataModal(); };
+
+  if ($("#btn-export")) $("#btn-export").onclick = exportData;
+
+  if ($("#btn-clear-all")) $("#btn-clear-all").onclick = async () => {
+    if (!confirm("⚠ Supprimer TOUTES les données locales VOANH ? Cette action est irréversible.")) return;
+    const stores = ['chats','agents','settings','global_memory'];
+    for (const s of stores) {
+      const all = await db.getAll(s) || [];
+      for (const r of all) await db.delete(s, r.id);
+    }
+    state.messages = [];
+    state.agent = null;
+    state.globalMemories = [];
+    await newChat();
+    await loadAgents();
+    renderMemoryList();
+    closeDataModal();
+    toast("Toutes les données supprimées", "success");
+  };
+
+  // Import zone — étape 1 : sélection + aperçu
+  let pendingImportFile = null;
+
+  const dropZone = $("#import-drop-zone");
+  const fileInput = $("#import-file-input");
+  const importPreview = $("#import-preview");
+
+  const showImportPreview = async (file) => {
+    pendingImportFile = file;
+    $("#import-filename").textContent = file.name;
+    $("#import-fileinfo").textContent = `${(file.size / 1024).toFixed(1)} KB — ${new Date(file.lastModified).toLocaleDateString('fr-FR')}`;
+    $("#import-summary").textContent = "Analyse en cours…";
+    importPreview.style.display = "block";
+    dropZone.style.opacity = "0.4";
+
+    try {
+      const text = await file.text();
+      const payload = JSON.parse(text);
+      const data = payload.data || payload;
+      const nbChats = data.chats?.length || 0;
+      const nbAgents = data.agents?.length || 0;
+      const nbMems = data.global_memory?.length || 0;
+      const exported = payload.exported ? `Sauvegarde du ${new Date(payload.exported).toLocaleString('fr-FR')}` : "Date inconnue";
+      $("#import-summary").innerHTML = `
+        <strong style="color:var(--neon)">✓ Fichier valide</strong><br>
+        ${exported}<br>
+        ▸ ${nbChats} conversation(s) &nbsp;|&nbsp; ${nbAgents} agent(s) &nbsp;|&nbsp; ${nbMems} souvenir(s)
+      `;
+    } catch(e) {
+      $("#import-summary").innerHTML = `<span style="color:var(--danger)">⚠ Fichier invalide ou corrompu : ${e.message}</span>`;
+      pendingImportFile = null;
+    }
+  };
+
+  const resetImportUI = () => {
+    pendingImportFile = null;
+    importPreview.style.display = "none";
+    dropZone.style.opacity = "1";
+    if (fileInput) fileInput.value = "";
+  };
+
+  if (dropZone && fileInput) {
+    dropZone.onclick = () => fileInput.click();
+    dropZone.ondragover = e => { e.preventDefault(); dropZone.classList.add("dragover"); };
+    dropZone.ondragleave = () => dropZone.classList.remove("dragover");
+    dropZone.ondrop = e => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      const file = e.dataTransfer.files[0];
+      if (file) showImportPreview(file);
+    };
+    fileInput.onchange = e => {
+      const file = e.target.files[0];
+      if (file) showImportPreview(file);
+    };
+  }
+
+  // Import étape 2 : confirmer
+  if ($("#btn-import-confirm")) {
+    $("#btn-import-confirm").onclick = async () => {
+      if (!pendingImportFile) return;
+      const btn = $("#btn-import-confirm");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spin-ring"></span> RESTAURATION…';
+      try {
+        await importData(pendingImportFile);
+        resetImportUI();
+        await computeStats();
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '✓ VALIDER ET RESTAURER';
+      }
+    };
+  }
+  if ($("#btn-import-cancel")) {
+    $("#btn-import-cancel").onclick = resetImportUI;
+  }
+
+  // ══ BURGER MENU MOBILE ══
+  const burgerBtn = $("#burger-btn");
+  const mobileMenu = $("#mobile-menu");
+
+  const closeBurger = () => mobileMenu.classList.remove("open");
+
+  if (burgerBtn && mobileMenu) {
+    burgerBtn.onclick = (e) => {
+      e.stopPropagation();
+      mobileMenu.classList.toggle("open");
+    };
+
+    // Sync mobile selects with desktop selects
+    const syncMobile = () => {
+      const mMod = $("#model-select-mob");
+      const mAgent = $("#agent-select-mob");
+      const mTheme = $("#theme-select-mob");
+      if (mMod) { mMod.innerHTML = $("#model-select").innerHTML; mMod.value = state.model; }
+      if (mAgent) { mAgent.innerHTML = $("#agent-select").innerHTML; mAgent.value = state.agent?.id || ""; }
+      if (mTheme) mTheme.value = document.documentElement.dataset.theme;
+    };
+
+    mobileMenu.addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', () => closeBurger());
+
+    // Mobile model select
+    const mModSel = $("#model-select-mob");
+    if (mModSel) {
+      // Populate
+      MODELS.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m.id;
+        opt.textContent = `◈ ${m.name}`;
+        mModSel.appendChild(opt);
+      });
+      mModSel.value = state.model;
+      mModSel.onchange = e => {
+        state.model = e.target.value;
+        $("#model-select").value = state.model;
+        db.put('settings', { id:'model', value:state.model }).catch(()=>{});
+        const sys = (state.messages||[]).find(m => m.role === "system");
+        if (sys) { sys.content = buildSystemPrompt(); saveChat(); }
+      };
+    }
+
+    // Mobile agent select
+    const mAgentSel = $("#agent-select-mob");
+    if (mAgentSel) {
+      mAgentSel.onchange = async e => {
+        try {
+          state.agent = e.target.value ? await db.get('agents', e.target.value) : null;
+          $("#agent-select").value = e.target.value;
+          const sys = (state.messages||[]).find(m => m.role === "system");
+          if (sys) { sys.content = buildSystemPrompt(); await saveChat(); renderMessages(); }
+        } catch(err) { console.error(err); }
+      };
+    }
+
+    // Mobile theme select
+    const mThemeSel = $("#theme-select-mob");
+    if (mThemeSel) {
+      mThemeSel.onchange = e => {
+        document.documentElement.dataset.theme = e.target.value;
+        $("#theme-select").value = e.target.value;
+        db.put('settings', { id:'theme', value:e.target.value }).catch(()=>{});
+      };
+    }
+
+    // Mobile API modal
+    if ($("#open-api-modal-mob")) $("#open-api-modal-mob").onclick = () => { closeBurger(); $("#api-modal").classList.add("active"); };
+    // Mobile Agent modal
+    if ($("#open-agent-modal-mob")) $("#open-agent-modal-mob").onclick = async () => { closeBurger(); await loadAgents(); $("#agent-modal").classList.add("active"); };
+    // Mobile Data modal
+    if ($("#open-data-modal-mob")) $("#open-data-modal-mob").onclick = async () => { closeBurger(); await computeStats(); $("#data-modal").classList.add("active"); };
+    // Mobile clear / new
+    if ($("#clear-chat-mob")) $("#clear-chat-mob").onclick = () => { closeBurger(); $("#clear-chat").click(); };
+    if ($("#new-chat-mob")) $("#new-chat-mob").onclick = () => { closeBurger(); newChat(); };
+
+    // Sync mobile status pill
+    const syncStatusMob = () => {
+      const mob = $("#api-status-mob");
+      if (!mob) return;
+      mob.innerHTML = $("#api-status").innerHTML;
+      mob.className = $("#api-status").className;
+    };
+
+    // Override the api status update to also sync mobile
+    const origSaveKey = document.getElementById("save-api-key");
+    if (origSaveKey) {
+      const origClick = origSaveKey.onclick;
+      origSaveKey.onclick = (...args) => {
+        if (origClick) origClick.apply(this, args);
+        setTimeout(syncStatusMob, 100);
+      };
+    }
+
+    // Sync on open
+    burgerBtn.addEventListener('click', syncStatusMob);
+  }
+
+  // Close memory panel on outside click
+  document.addEventListener('click', e => {
+    const panel = $("#memory-panel");
+    const toggle = $("#memory-toggle");
+    if (panel.classList.contains("active") && !panel.contains(e.target) && e.target !== toggle) {
+      panel.classList.remove("active");
+    }
+  });
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
