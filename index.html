@@ -1766,6 +1766,7 @@ function renderMessages() {
     const memTags = m.memoryUsed?.length ? `<span class="mem-tag">⬡ MEM×${m.memoryUsed.length}</span>` : '';
     const label = m.role === 'user' ? '▸ VOUS' : `▸ ${state.agent ? state.agent.name.toUpperCase() : 'VOANH'}`;
     const msgId = m.ts || Date.now();
+    const memoBtn = m.role === 'assistant' ? '<button class="msg-action-btn" onclick="saveToMemory(' + msgId + ')">⬡ MÉMO</button>' : '';
     div.innerHTML = `
       <div class="msg-label">${label}</div>
       <div class="message-content" id="mc-${msgId}">${escapeHtml(m.content || '')}</div>
@@ -1775,7 +1776,7 @@ function renderMessages() {
       </div>
       <div class="msg-actions">
         <button class="msg-action-btn" onclick="copyMsg(${msgId})">⎘ COPIER</button>
-        ${m.role==='assistant'?`<button class="msg-action-btn" onclick="saveToMemory(${msgId})">⬡ MÉMO</button>`:''}
+        ${memoBtn}
       </div>`;
     c.appendChild(div);
   });
