@@ -289,18 +289,55 @@ button.ghost:hover { background: var(--surface); }
 
 <!-- API Modal -->
 <div class="modal" id="api-modal">
-  <div class="modal-content">
-    <h2>🚀 Activate Mistral AI Free Tier</h2>
-    <div class="info-card">
-      <p><strong>💡 Official Free Offer:</strong> Mistral provides <strong>1 billion tokens/month</strong> on their free tier API. That's over <strong>€5,000</strong> in monthly compute value — completely free.</p>
-      <p style="margin-top:9px"><strong>📊 Market Comparison:</strong> Competitors charge ~$0.15–$2.00 per million tokens. 1B tokens = ~1,000–2,000€ saved monthly = thousands of complex queries free.</p>
-      <p style="margin-top:9px"><strong>🔗 Get Your Key:</strong> Visit <code>console.mistral.ai</code> → Create account → API Keys → Generate → Copy your key below.</p>
+ <div class="modal-content">
+  <h2>🚀 Activer Mistral AI — 100% Gratuit</h2>
+  
+  <!-- Formulaire en premier -->
+  <div class="form-group" style="margin-bottom:22px">
+    <label>🔑 Votre clé API Mistral</label>
+    <input type="password" id="api-key-input" placeholder="Collez votre clé ici (ex: sk-...)">
+    <div class="model-hint">Format : commence par <code>sk-</code> ou <code>mistral-</code>, min. 20 caractères</div>
+  </div>
+  <div class="btn-row" style="margin-bottom:24px">
+    <button id="save-api-key" class="primary">💾 Enregistrer & Activer</button>
+    <button id="close-api-modal" class="ghost">Annuler</button>
+  </div>
+  
+  <!-- Tutoriel en français ensuite -->
+  <div class="info-card">
+    <h3 style="margin-bottom:12px;color:var(--primary)">🎁 Comment obtenir votre clé gratuite en 2 minutes</h3>
+    
+    <p><strong>✨ La bonne nouvelle ?</strong> Mistral offre <strong>1 milliard de tokens par mois</strong> gratuitement. C'est l'équivalent de <strong>plus de 5 000 €</strong> de puissance IA — chaque mois, sans payer un centime.</p>
+    
+    <div style="background:var(--bg);padding:12px;border-radius:8px;margin:12px 0">
+      <p style="font-weight:600;margin-bottom:8px">📊 Pour comprendre la valeur :</p>
+      <ul style="padding-left:18px;font-size:13px;line-height:1.7">
+        <li>Chez OpenAI ou Anthropic : ~1,50 € pour 1 million de tokens</li>
+        <li>Avec Mistral Free Tier : <strong>1 000 millions de tokens = 0 €</strong></li>
+        <li>Soit <strong>~1 500 € économisés chaque mois</strong> pour vos projets !</li>
+      </ul>
     </div>
-    <div class="form-group">
-      <label>Your Mistral API Key</label>
-      <input type="password" id="api-key-input" placeholder="Paste your API key here...">
-      <div class="model-hint">Format: Usually starts with <code>sk-</code> or <code>mistral-</code>, min 20 characters</div>
+    
+    <p style="font-weight:600;margin:14px 0 8px">🗝️ Obtenir votre clé en 4 étapes simples :</p>
+    <ol style="padding-left:18px;font-size:14px;line-height:1.8">
+      <li>Rendez-vous sur <strong><code>console.mistral.ai</code></strong></li>
+      <li>Cliquez sur <strong>"Sign Up"</strong> → créez votre compte (email + mot de passe)</li>
+      <li>Dans le menu, allez dans <strong>"API Keys"</strong> → cliquez sur <strong>"Create Key"</strong></li>
+      <li>Copiez la clé générée (elle commence par <code>sk-</code>) et collez-la ci-dessus ✨</li>
+    </ol>
+    
+    <div style="background:rgba(16,185,129,0.1);border-left:3px solid var(--success);padding:10px 12px;border-radius:6px;margin-top:14px">
+      <p style="font-size:13px;margin:0">
+        <strong>💡 Astuce pro :</strong> Votre clé est stockée uniquement dans votre navigateur (cookie sécurisé). 
+        Elle n'est jamais envoyée à nos serveurs. Vous gardez le contrôle total.
+      </p>
     </div>
+    
+    <p style="margin-top:14px;font-size:13px;color:var(--text-muted)">
+      🔄 Besoin d'aide ? Consultez la <a href="https://docs.mistral.ai" target="_blank" style="color:var(--primary)">documentation officielle Mistral</a>.
+    </p>
+  </div>
+</div>
     <div class="btn-row">
       <button id="save-api-key" class="primary">💾 Save & Activate</button>
       <button id="close-api-modal" class="ghost">Cancel</button>
